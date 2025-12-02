@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-public class Turma {
+public class Disciplina {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,9 +12,10 @@ public class Turma {
 
     private String nome;
 
-    @OneToMany(mappedBy = "turma")
-    private List<Aluno> alunos;
+    @OneToMany(mappedBy = "disciplina")
+    private List<Avaliacao> avaliacoes;
 
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -30,5 +31,12 @@ public class Turma {
     public void setNome(String nome) {
         this.nome = nome;
     }
- 
+
+    public List<Avaliacao> getAvaliacoes() {
+        return avaliacoes;
+    }
+
+    public void setAvaliacoes(List<Avaliacao> avaliacoes) {
+        this.avaliacoes = avaliacoes;
+    }
 }
