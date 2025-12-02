@@ -1,6 +1,7 @@
 package br.com.boletim.backend.controller;
 
 import br.com.boletim.backend.domain.Aluno;
+import br.com.boletim.backend.domain.Nota;
 import br.com.boletim.backend.service.AlunoService;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +34,10 @@ public class AlunoController {
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable Long id) {
         alunoService.deletar(id);
+    }
+
+    @GetMapping("/{id}/notas")
+    public List<Nota> listarNotasPorAluno(@PathVariable Long id) {
+        return alunoService.buscarNotasPorAluno(id);
     }
 }

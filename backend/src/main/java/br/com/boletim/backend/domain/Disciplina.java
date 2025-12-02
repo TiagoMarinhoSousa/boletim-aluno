@@ -1,5 +1,6 @@
 package br.com.boletim.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -13,9 +14,10 @@ public class Disciplina {
     private String nome;
 
     @OneToMany(mappedBy = "disciplina")
+    @JsonIgnore
     private List<Avaliacao> avaliacoes;
 
-    // Getters e Setters
+    // getters e setters
     public Long getId() {
         return id;
     }

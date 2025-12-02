@@ -1,7 +1,7 @@
 package br.com.boletim.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 public class Avaliacao {
@@ -14,12 +14,10 @@ public class Avaliacao {
 
     @ManyToOne
     @JoinColumn(name = "disciplina_id")
+    @JsonBackReference
     private Disciplina disciplina;
 
-    @OneToMany(mappedBy = "avaliacao")
-    private List<Nota> notas;
-
-    // Getters e Setters
+    // getters e setters
     public Long getId() {
         return id;
     }
@@ -42,13 +40,5 @@ public class Avaliacao {
 
     public void setDisciplina(Disciplina disciplina) {
         this.disciplina = disciplina;
-    }
-
-    public List<Nota> getNotas() {
-        return notas;
-    }
-
-    public void setNotas(List<Nota> notas) {
-        this.notas = notas;
     }
 }

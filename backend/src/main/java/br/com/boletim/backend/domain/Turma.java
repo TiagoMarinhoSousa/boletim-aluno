@@ -1,5 +1,6 @@
 package br.com.boletim.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -13,8 +14,10 @@ public class Turma {
     private String nome;
 
     @OneToMany(mappedBy = "turma")
+    @JsonIgnore
     private List<Aluno> alunos;
 
+    // getters e setters
     public Long getId() {
         return id;
     }
@@ -30,5 +33,12 @@ public class Turma {
     public void setNome(String nome) {
         this.nome = nome;
     }
- 
+
+    public List<Aluno> getAlunos() {
+        return alunos;
+    }
+
+    public void setAlunos(List<Aluno> alunos) {
+        this.alunos = alunos;
+    }
 }

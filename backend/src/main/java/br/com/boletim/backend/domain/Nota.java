@@ -1,5 +1,6 @@
 package br.com.boletim.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,11 +14,13 @@ public class Nota {
 
     @ManyToOne
     @JoinColumn(name = "aluno_id")
+    @JsonBackReference
     private Aluno aluno;
 
     @ManyToOne
     @JoinColumn(name = "avaliacao_id")
     private Avaliacao avaliacao;
+
 
     // Getters e Setters
     public Long getId() {
