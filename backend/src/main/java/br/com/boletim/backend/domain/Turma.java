@@ -1,6 +1,7 @@
 package br.com.boletim.backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class Turma {
     private String nome;
 
     @OneToMany(mappedBy = "turma")
-    @JsonIgnore
+    @JsonManagedReference
     private List<Aluno> alunos;
 
     // getters e setters

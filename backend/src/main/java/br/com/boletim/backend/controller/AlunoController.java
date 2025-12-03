@@ -2,6 +2,7 @@ package br.com.boletim.backend.controller;
 
 import br.com.boletim.backend.domain.Aluno;
 import br.com.boletim.backend.domain.Nota;
+import br.com.boletim.backend.dto.AlunoDTO;
 import br.com.boletim.backend.service.AlunoService;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/alunos")
 public class AlunoController {
+
     private final AlunoService alunoService;
 
     public AlunoController(AlunoService alunoService) {
@@ -27,8 +29,8 @@ public class AlunoController {
     }
 
     @PostMapping
-    public Aluno salvar(@RequestBody Aluno aluno) {
-        return alunoService.salvar(aluno);
+    public Aluno salvar(@RequestBody AlunoDTO alunoDTO) {
+        return alunoService.salvar(alunoDTO);
     }
 
     @DeleteMapping("/{id}")

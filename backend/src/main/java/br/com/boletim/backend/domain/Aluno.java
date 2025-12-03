@@ -3,6 +3,7 @@ package br.com.boletim.backend.domain;
 import jakarta.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -16,6 +17,7 @@ public class Aluno {
 
     @ManyToOne
     @JoinColumn(name = "turma_id")
+    @JsonBackReference
     private Turma turma;
 
     @OneToMany(mappedBy = "aluno")
