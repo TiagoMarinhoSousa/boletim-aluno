@@ -48,22 +48,46 @@ public class NotaService {
         return notaRepository.findByAlunoId(alunoId);
     }
 
-   public Double calcularMediaPonderadaPorAluno(Long alunoId) {
-    List<Nota> notas = notaRepository.findByAlunoId(alunoId);
-    if (notas.isEmpty()) {
-        return 0.0;
+    public Double calcularMediaPonderadaPorAluno(Long alunoId) {
+        List<Nota> notas = notaRepository.findByAlunoId(alunoId);
+        if (notas.isEmpty()) {
+            return 0.0;
+        }
+
+        double somaNotasXPeso = 0.0;
+        int somaPesos = 0;
+
+        for (Nota nota : notas) {
+            int peso = nota.getAvaliacao().getPeso();
+            somaNotasXPeso += nota.getValor() * peso;
+            somaPesos += peso;
+        }
+
+        return somaPesos == 0 ? 0.0 : somaNotasXPeso / somaPesos;
     }
 
-    double somaNotasXPeso = 0.0;
-    int somaPesos = 0;
-
-    for (Nota nota : notas) {
-        int peso = nota.getAvaliacao().getPeso();
-        somaNotasXPeso += nota.getValor() * peso;
-        somaPesos += peso;
+    public List<Nota> listarBoletimPorAluno(Long alunoId) {
+        return notaRepository.findByAlunoId(alunoId);
     }
 
-    return somaPesos == 0 ? 0.0 : somaNotasXPeso / somaPesos;
-}
+    public Double calcularMediaPonderadaPorDisciplina(Long disciplinaId) {
+        List<Nota> notas = notaRepository.findAll().stream()
+                .filter(n -> n.getAvaliacao().getDisciplina().getId().equals(disciplinaId))
+                .toList();
 
+        if (notas.isEmpty()) {
+            return 0.0;
+        }
+
+        double somaNotasXPeso = 0.0;
+        int somaPesos = 0;
+
+        for (Nota nota : notas) {
+            int peso = nota.getAvaliacao().getPeso();
+            somaNotasXPeso += nota.getValor() * peso;
+            somaPesos += peso;
+        }
+
+        return somaPesos == 0 ? 0.0 : somaNotasXPeso / somaPesos;
+    }
 }

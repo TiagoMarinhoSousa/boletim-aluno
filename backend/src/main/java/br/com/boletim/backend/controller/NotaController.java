@@ -37,4 +37,14 @@ public class NotaController {
         return notaService.calcularMediaPonderadaPorAluno(alunoId);
     }
 
+    @GetMapping("/aluno/{alunoId}/boletim")
+    public List<Nota> listarBoletimPorAluno(@PathVariable Long alunoId) {
+        return notaService.listarBoletimPorAluno(alunoId);
+    }
+
+    @GetMapping("/disciplina/{disciplinaId}/media-ponderada")
+    public Double calcularMediaPonderadaPorDisciplina(@PathVariable Long disciplinaId) {
+        return notaService.calcularMediaPonderadaPorDisciplina(disciplinaId);
+    }
+
 }
