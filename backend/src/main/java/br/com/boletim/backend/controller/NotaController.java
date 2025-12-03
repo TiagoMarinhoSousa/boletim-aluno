@@ -24,6 +24,11 @@ public class NotaController {
         return notaService.salvar(notaDTO);
     }
 
+    @PostMapping("/lote")
+    public List<Nota> salvarEmLote(@Valid @RequestBody List<NotaDTO> notasDTO) {
+        return notaService.salvarEmLote(notasDTO);
+    }
+
     @GetMapping
     public List<Nota> listarTodas() {
         return notaService.listarTodas();

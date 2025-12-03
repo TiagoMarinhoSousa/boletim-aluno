@@ -19,8 +19,8 @@ public class NotaService {
     private final AvaliacaoRepository avaliacaoRepository;
 
     public NotaService(NotaRepository notaRepository,
-                       AlunoRepository alunoRepository,
-                       AvaliacaoRepository avaliacaoRepository) {
+            AlunoRepository alunoRepository,
+            AvaliacaoRepository avaliacaoRepository) {
         this.notaRepository = notaRepository;
         this.alunoRepository = alunoRepository;
         this.avaliacaoRepository = avaliacaoRepository;
@@ -105,4 +105,11 @@ public class NotaService {
 
         return somaPesos == 0 ? 0.0 : somaNotasXPeso / somaPesos;
     }
+
+    public List<Nota> salvarEmLote(List<NotaDTO> notasDTO) {
+        return notasDTO.stream()
+                .map(this::salvar) // usa a lógica de sobrescrita já existente
+                .toList();
+    }
+
 }
