@@ -4,8 +4,9 @@ import { AlunoService } from '../../services/aluno.service';
 import { NotaService } from '../../services/nota.service';
 import { Turma } from '../../models/turma.model';
 import { Aluno } from '../../models/aluno.model';
-import { Avaliacao } from '../../models/avaliacao.model';
+import { AvaliacaoService } from '../../services/avaliacao.service';
 import { Nota } from '../../models/nota.model';
+import { Avaliacao } from 'src/app/models/avaliacao.model';
 
 @Component({
   selector: 'app-nota',
