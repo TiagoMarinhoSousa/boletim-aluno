@@ -1,6 +1,7 @@
 package br.com.boletim.backend.service;
 
 import br.com.boletim.backend.domain.Disciplina;
+import br.com.boletim.backend.dto.DisciplinaDTO;
 import br.com.boletim.backend.repository.DisciplinaRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +15,19 @@ public class DisciplinaService {
         this.disciplinaRepository = disciplinaRepository;
     }
 
+    public Disciplina salvar(DisciplinaDTO disciplinaDTO) {
+        Disciplina disciplina = new Disciplina();
+        disciplina.setNome(disciplinaDTO.getNome());
+        return disciplinaRepository.save(disciplina);
+    }
+
     public List<Disciplina> listarTodas() {
         return disciplinaRepository.findAll();
     }
 
-    public Disciplina salvar(Disciplina disciplina) {
-        return disciplinaRepository.save(disciplina);
-    }
-
     public Disciplina buscarPorId(Long id) {
-        return disciplinaRepository.findById(id).orElse(null);
+        return disciplinaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
     }
 
     public void deletar(Long id) {

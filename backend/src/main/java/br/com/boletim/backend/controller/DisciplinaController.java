@@ -1,6 +1,7 @@
 package br.com.boletim.backend.controller;
 
 import br.com.boletim.backend.domain.Disciplina;
+import br.com.boletim.backend.dto.DisciplinaDTO;
 import br.com.boletim.backend.service.DisciplinaService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,11 @@ public class DisciplinaController {
         this.disciplinaService = disciplinaService;
     }
 
+    @PostMapping
+    public Disciplina salvar(@RequestBody DisciplinaDTO disciplinaDTO) {
+        return disciplinaService.salvar(disciplinaDTO);
+    }
+
     @GetMapping
     public List<Disciplina> listarTodas() {
         return disciplinaService.listarTodas();
@@ -25,13 +31,9 @@ public class DisciplinaController {
         return disciplinaService.buscarPorId(id);
     }
 
-    @PostMapping
-    public Disciplina salvar(@RequestBody Disciplina disciplina) {
-        return disciplinaService.salvar(disciplina);
-    }
-
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable Long id) {
         disciplinaService.deletar(id);
     }
+
 }
