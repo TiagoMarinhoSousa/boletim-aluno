@@ -57,8 +57,8 @@ export class NotaComponent implements OnInit {
 
   getValorDoEvento(event: Event): number {
     const input = event.target as HTMLInputElement;
-    // Se o input tem "-", retorna NaN para forçar validação
-    if (input.value === '-') {
+    // Retorna NaN se input vazio ou se tiver "-"
+    if (input.value === '' || input.value === '-') {
       return NaN;
     }
     return input.valueAsNumber;
@@ -128,8 +128,24 @@ export class NotaComponent implements OnInit {
   atualizarNota(alunoId: number, avaliacaoId: number, valor: number, inputElement?: HTMLInputElement): void {
     const chave = `${alunoId}-${avaliacaoId}`;
     
+    // Se o input está vazio (NaN), permite remover a nota
+    if (isNaN(valor)) {
+      // Remove nota do array se existir
+      const index = this.notas.findIndex(
+        (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
+      );
+      if (index !== -1) {
+        this.notas.splice(index, 1);
+        this.notasAlteradas.add(chave);
+        this.notas = [...this.notas];
+      }
+      // Remove da marcação de inválido
+      this.inputsInvalidos.delete(chave);
+      return;
+    }
+
     // Validação: nota deve estar entre 0 e 10
-    if (valor < 0 || valor > 10 || isNaN(valor)) {
+    if (valor < 0 || valor > 10) {
       alert('Nota deve estar entre 0 e 10');
       // Marca como inválido
       this.inputsInvalidos.add(chave);
