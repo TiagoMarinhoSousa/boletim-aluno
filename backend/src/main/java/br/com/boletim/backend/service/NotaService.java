@@ -10,6 +10,7 @@ import br.com.boletim.backend.repository.NotaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NotaService {
@@ -18,13 +19,16 @@ public class NotaService {
     private final AvaliacaoRepository avaliacaoRepository;
 
     public NotaService(NotaRepository notaRepository,
-            AlunoRepository alunoRepository,
-            AvaliacaoRepository avaliacaoRepository) {
+                       AlunoRepository alunoRepository,
+                       AvaliacaoRepository avaliacaoRepository) {
         this.notaRepository = notaRepository;
         this.alunoRepository = alunoRepository;
         this.avaliacaoRepository = avaliacaoRepository;
     }
 
+    /**
+     * Salva ou sobrescreve a nota de um aluno para uma avaliação.
+     */
     public Nota salvar(NotaDTO notaDTO) {
         Aluno aluno = alunoRepository.findById(notaDTO.getAlunoId())
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
@@ -32,10 +36,21 @@ public class NotaService {
         Avaliacao avaliacao = avaliacaoRepository.findById(notaDTO.getAvaliacaoId())
                 .orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
 
-        Nota nota = new Nota();
-        nota.setAluno(aluno);
-        nota.setAvaliacao(avaliacao);
-        nota.setValor(notaDTO.getValor());
+        // Verifica se já existe nota para esse aluno e avaliação
+        Optional<Nota> existente = notaRepository.findByAlunoIdAndAvaliacaoId(aluno.getId(), avaliacao.getId());
+
+        Nota nota;
+        if (existente.isPresent()) {
+            // sobrescreve a nota existente
+            nota = existente.get();
+            nota.setValor(notaDTO.getValor());
+        } else {
+            // cria nova nota
+            nota = new Nota();
+            nota.setAluno(aluno);
+            nota.setAvaliacao(avaliacao);
+            nota.setValor(notaDTO.getValor());
+        }
 
         return notaRepository.save(nota);
     }

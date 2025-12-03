@@ -2,14 +2,19 @@ package br.com.boletim.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "aluno_id", "avaliacao_id" }))
 public class Nota {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @DecimalMin(value = "0.0", inclusive = true, message = "Nota mínima é 0")
+    @DecimalMax(value = "10.0", inclusive = true, message = "Nota máxima é 10")
     private Double valor;
 
     @ManyToOne
@@ -20,7 +25,6 @@ public class Nota {
     @ManyToOne
     @JoinColumn(name = "avaliacao_id")
     private Avaliacao avaliacao;
-
 
     // Getters e Setters
     public Long getId() {
