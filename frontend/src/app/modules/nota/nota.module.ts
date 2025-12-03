@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NotaRoutingModule } from './nota-routing.module';
 import { NotaComponent } from './nota.component';
 
@@ -15,6 +16,8 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [
     CommonModule,
     NotaRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
     MatTableModule,
     MatFormFieldModule,
     MatSelectModule,

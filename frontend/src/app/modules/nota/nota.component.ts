@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Aluno } from '../../models/aluno.model';
+import { TurmaService } from '../../services/turma.service';
+import { AlunoService } from '../../services/aluno.service';
+import { NotaService, NotaDTO } from '../../services/nota.service';
 import { Avaliacao } from '../../models/avaliacao.model';
-import { Nota } from '../../models/nota.model';
+import {
+  DisciplinaService,
+  Disciplina,
+} from '../../services/disciplina.service';
 
 @Component({
   selector: 'app-nota',
@@ -9,81 +14,71 @@ import { Nota } from '../../models/nota.model';
   styleUrls: ['./nota.component.scss'],
 })
 export class NotaComponent implements OnInit {
-  turmas: { id: number; nome: string }[] = [];
-  disciplinas: { id: number; nome: string }[] = [];
-  alunos: Aluno[] = [];
+  turmas: any[] = [];
+  disciplinas: Disciplina[] = [];
+  alunos: any[] = [];
   avaliacoes: Avaliacao[] = [];
-  notas: Nota[] = [];
+  notas: NotaDTO[] = [];
 
   turmaSelecionada: number | null = null;
   disciplinaSelecionada: number | null = null;
 
-  colunasTabela: string[] = ['aluno', 'media']; // inicial
+  colunasTabela: string[] = ['aluno', 'media'];
+
+  constructor(
+    private turmaService: TurmaService,
+    private alunoService: AlunoService,
+    private disciplinaService: DisciplinaService,
+    private notaService: NotaService
+  ) {}
 
   ngOnInit(): void {
-    // Mock inicial de turmas e disciplinas
-    this.turmas = [
-      { id: 1, nome: 'Turma A' },
-      { id: 2, nome: 'Turma B' },
-    ];
-
-    this.disciplinas = [
-      { id: 1, nome: 'Matemática' },
-      { id: 2, nome: 'Português' },
-      { id: 3, nome: 'História' },
-    ];
+    // Carregar turmas e disciplinas do backend
+    this.turmaService
+      .listarTodas()
+      .subscribe((turmas) => (this.turmas = turmas));
+    this.disciplinaService
+      .listarTodas()
+      .subscribe((disciplinas) => (this.disciplinas = disciplinas));
   }
 
   selecionarTurma(turmaId: number) {
     this.turmaSelecionada = turmaId;
-
-    // Resetar disciplina ao trocar de turma
     this.disciplinaSelecionada = null;
     this.avaliacoes = [];
     this.notas = [];
     this.colunasTabela = ['aluno', 'media'];
 
-    // Mock de alunos por turma
-    if (turmaId === 1) {
-      this.alunos = [
-        { id: 1, nome: 'Ana' },
-        { id: 2, nome: 'Pedro' },
-      ];
-    } else if (turmaId === 2) {
-      this.alunos = [
-        { id: 3, nome: 'Carla' },
-        { id: 4, nome: 'Tadeu' },
-      ];
-    }
+    // Buscar alunos da turma no backend
+    this.turmaService.listarAlunosPorTurma(turmaId).subscribe((alunos) => {
+      this.alunos = alunos;
+    });
   }
 
   selecionarDisciplina(disciplinaId: number) {
     this.disciplinaSelecionada = disciplinaId;
 
-    // Definir avaliações fixas
+    // Avaliações fixas (pode ser substituído futuramente por AvaliacaoController)
     this.avaliacoes = [
       { id: 1, nome: 'Prova', peso: 5, disciplinaId },
       { id: 2, nome: 'Trabalho', peso: 2, disciplinaId },
       { id: 3, nome: 'Atividade', peso: 1, disciplinaId },
     ];
 
-    // Atualizar colunas da tabela com ids únicos
     this.colunasTabela = [
       'aluno',
       ...this.avaliacoes.map((a) => 'avaliacao-' + a.id),
       'media',
     ];
 
-    // Mock de notas (exemplo simples)
+    // Buscar notas de cada aluno no backend
     this.notas = [];
     this.alunos.forEach((aluno) => {
-      this.avaliacoes.forEach((avaliacao) => {
-        this.notas.push({
-          alunoId: aluno.id,
-          avaliacaoId: avaliacao.id,
-          valor: Math.floor(Math.random() * 4) + 7, // notas aleatórias 7–10
+      this.alunoService
+        .listarNotasPorAluno(aluno.id)
+        .subscribe((notasAluno) => {
+          notasAluno.forEach((n) => this.notas.push(n));
         });
-      });
     });
   }
 
@@ -127,6 +122,8 @@ export class NotaComponent implements OnInit {
   }
 
   salvarNotas() {
-    console.log('Notas salvas:', this.notas);
+    this.notaService.salvarNotasEmLote(this.notas).subscribe(() => {
+      console.log('Notas salvas com sucesso!');
+    });
   }
 }

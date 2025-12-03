@@ -1,7 +1,7 @@
 <!-- Seleção de turma e disciplina -->
-<div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: center">
+<div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: center;">
   <!-- Dropdown de Turma -->
-  <mat-form-field appearance="fill" style="min-width: 240px">
+  <mat-form-field appearance="fill" style="min-width: 240px;">
     <mat-label>Selecione a Turma</mat-label>
     <mat-select (selectionChange)="selecionarTurma($event.value)">
       <mat-option *ngFor="let turma of turmas" [value]="turma.id">
@@ -11,18 +11,13 @@
   </mat-form-field>
 
   <!-- Dropdown de Disciplina -->
-  <mat-form-field appearance="fill" style="min-width: 240px">
+  <mat-form-field appearance="fill" style="min-width: 240px;">
     <mat-label>Selecione a Disciplina</mat-label>
-    <mat-select
-      [(value)]="disciplinaSelecionada"
-      (selectionChange)="selecionarDisciplina($event.value)"
-      [disabled]="!turmaSelecionada"
-    >
+    <mat-select [(value)]="disciplinaSelecionada"
+                (selectionChange)="selecionarDisciplina($event.value)"
+                [disabled]="!turmaSelecionada">
       <mat-option [value]="null">Selecione...</mat-option>
-      <mat-option
-        *ngFor="let disciplina of disciplinas"
-        [value]="disciplina.id"
-      >
+      <mat-option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">
         {{ disciplina.nome }}
       </mat-option>
     </mat-select>
@@ -30,46 +25,33 @@
 </div>
 
 <!-- Tabela de notas -->
-<table
-  mat-table
-  [dataSource]="alunos"
-  class="mat-elevation-z8"
-  style="width: 100%"
->
+<table mat-table [dataSource]="alunos" class="mat-elevation-z8" style="width: 100%;">
+
   <!-- Coluna Aluno -->
   <ng-container matColumnDef="aluno">
-    <th mat-header-cell *matHeaderCellDef>Aluno</th>
-    <td mat-cell *matCellDef="let aluno">{{ aluno.nome }}</td>
+    <th mat-header-cell *matHeaderCellDef> Aluno </th>
+    <td mat-cell *matCellDef="let aluno"> {{ aluno.nome }} </td>
   </ng-container>
 
   <!-- Colunas dinâmicas de avaliação -->
-  <ng-container
-    *ngFor="let avaliacao of avaliacoes"
-    [matColumnDef]="'avaliacao-' + avaliacao.id"
-  >
-    <th mat-header-cell *matHeaderCellDef>
-      {{ avaliacao.nome }} (peso {{ avaliacao.peso }})
-    </th>
+  <ng-container *ngFor="let avaliacao of avaliacoes" [matColumnDef]="'avaliacao-' + avaliacao.id">
+    <th mat-header-cell *matHeaderCellDef> {{ avaliacao.nome }} (peso {{ avaliacao.peso }}) </th>
     <td mat-cell *matCellDef="let aluno">
       <input
         matInput
         type="number"
-        [value]="
-          getNotaValor(aluno.id, avaliacao.id) !== '-'
-            ? getNotaValor(aluno.id, avaliacao.id)
-            : ''
-        "
-        placeholder="-"
+        [value]="getNotaValor(aluno.id, avaliacao.id) !== '-' ? getNotaValor(aluno.id, avaliacao.id) : ''"
         (input)="atualizarNota(aluno.id, avaliacao.id, $event)"
         min="0"
         max="10"
+        placeholder="-"
       />
     </td>
   </ng-container>
 
   <!-- Coluna Média -->
   <ng-container matColumnDef="media">
-    <th mat-header-cell *matHeaderCellDef>Média</th>
+    <th mat-header-cell *matHeaderCellDef> Média </th>
     <td mat-cell *matCellDef="let aluno">
       {{ calcularMedia(aluno.id) }}
     </td>
@@ -77,17 +59,14 @@
 
   <!-- Cabeçalho e linhas -->
   <tr mat-header-row *matHeaderRowDef="colunasTabela"></tr>
-  <tr mat-row *matRowDef="let row; columns: colunasTabela"></tr>
+  <tr mat-row *matRowDef="let row; columns: colunasTabela;"></tr>
 </table>
 
 <!-- Botão salvar -->
-<div style="margin-top: 16px">
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="salvarNotas()"
-    [disabled]="!turmaSelecionada || !disciplinaSelecionada"
-  >
+<div style="margin-top: 16px;">
+  <button mat-raised-button color="primary"
+          (click)="salvarNotas()"
+          [disabled]="!turmaSelecionada || !disciplinaSelecionada">
     Salvar Notas
   </button>
 </div>

@@ -2,9 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Ajuste os tipos conforme seus DTOs
-import { Aluno } from '../models/aluno.model';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -13,7 +10,11 @@ export class AlunoService {
 
   constructor(private http: HttpClient) {}
 
-  listarPorTurma(turmaId: number): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${this.apiUrl}/turma/${turmaId}`);
+  listarTodos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
+  }
+
+  listarNotasPorAluno(alunoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${alunoId}/notas`);
   }
 }
