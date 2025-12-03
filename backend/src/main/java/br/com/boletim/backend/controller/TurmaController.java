@@ -2,14 +2,14 @@ package br.com.boletim.backend.controller;
 
 import br.com.boletim.backend.domain.Aluno;
 import br.com.boletim.backend.domain.Turma;
-import br.com.boletim.backend.dto.TurmaDTO;           
+import br.com.boletim.backend.dto.RelatorioAlunoDTO;
+import br.com.boletim.backend.dto.TurmaDTO;
 import br.com.boletim.backend.service.AlunoService;
 import br.com.boletim.backend.service.TurmaService;
-import jakarta.validation.Valid;                      
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/turmas")
@@ -46,5 +46,13 @@ public class TurmaController {
     @GetMapping("/{turmaId}/alunos")
     public List<Aluno> listarAlunosPorTurma(@PathVariable Long turmaId) {
         return alunoService.buscarPorTurma(turmaId);
+    }
+
+    /**
+     * Endpoint de relatório consolidado da turma.
+     */
+    @GetMapping("/{id}/relatorio")
+    public List<RelatorioAlunoDTO> relatorio(@PathVariable Long id) {
+        return turmaService.gerarRelatorio(id);
     }
 }

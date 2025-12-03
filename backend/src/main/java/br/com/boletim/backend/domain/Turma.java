@@ -1,26 +1,21 @@
 package br.com.boletim.backend.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 @Entity
 public class Turma {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nome da turma é obrigatório")
     private String nome;
 
-    // Construtores
-    public Turma() {
-    }
+    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Disciplina> disciplinas;
 
-    public Turma(String nome) {
-        this.nome = nome;
-    }
-
-    // Getters e Setters
+    // getters e setters
     public Long getId() {
         return id;
     }
@@ -35,5 +30,13 @@ public class Turma {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
     }
 }

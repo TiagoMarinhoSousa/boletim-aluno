@@ -17,6 +17,11 @@ public class Disciplina {
     @JsonIgnore
     private List<Avaliacao> avaliacoes;
 
+    @ManyToOne
+    @JoinColumn(name = "turma_id")
+    private Turma turma;
+
+
     // getters e setters
     public Long getId() {
         return id;

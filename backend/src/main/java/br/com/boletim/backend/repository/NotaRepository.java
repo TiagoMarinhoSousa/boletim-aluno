@@ -13,4 +13,7 @@ public interface NotaRepository extends JpaRepository<Nota, Long> {
 
     // Buscar nota única de um aluno para uma avaliação específica
     Optional<Nota> findByAlunoIdAndAvaliacaoId(Long alunoId, Long avaliacaoId);
+
+    // novo método para buscar notas de um aluno em uma disciplina
+    List<Nota> findByAlunoIdAndDisciplinaId(Long alunoId, Long disciplinaId);
 }
