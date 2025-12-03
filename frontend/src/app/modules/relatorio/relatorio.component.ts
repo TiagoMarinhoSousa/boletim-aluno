@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Aluno } from '../../models/aluno.model';
 import { Avaliacao } from '../../models/avaliacao.model';
-import { Nota } from '../../models/nota.model';
+import { NotaDTO } from '../../models/nota.model';
 
 @Component({
   selector: 'app-relatorio',
@@ -11,7 +11,7 @@ import { Nota } from '../../models/nota.model';
 export class RelatorioComponent implements OnInit {
   alunos: Aluno[] = [];
   avaliacoes: Avaliacao[] = [];
-  notas: Nota[] = [];
+  notas: NotaDTO[] = [];
 
   ngOnInit(): void {
     // Mock de alunos
@@ -23,9 +23,9 @@ export class RelatorioComponent implements OnInit {
 
     // Mock de avaliações
     this.avaliacoes = [
-      { id: 1, nome: 'Prova', peso: 5, disciplinaId: 1 },
-      { id: 2, nome: 'Trabalho', peso: 2, disciplinaId: 1 },
-      { id: 3, nome: 'Atividade', peso: 1, disciplinaId: 1 },
+      { id: 1, descricao: 'Prova', peso: 5, disciplinaId: 1 },
+      { id: 2, descricao: 'Trabalho', peso: 2, disciplinaId: 1 },
+      { id: 3, descricao: 'Atividade', peso: 1, disciplinaId: 1 },
     ];
 
     // Mock de notas

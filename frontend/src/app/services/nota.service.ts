@@ -9,7 +9,7 @@ export interface NotaDTO {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotaService {
   private apiUrl = 'http://localhost:8080/notas'; // base do controller
@@ -28,12 +28,16 @@ export class NotaService {
     return this.http.get<any[]>(`${this.apiUrl}`);
   }
 
-  listarPorAluno(alunoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/aluno/${alunoId}`);
+  listarPorAluno(alunoId: number): Observable<NotaDTO[]> {
+    return this.http.get<NotaDTO[]>(
+      `http://localhost:8080/notas/aluno/${alunoId}`
+    );
   }
 
   calcularMediaPorAluno(alunoId: number): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/aluno/${alunoId}/media-ponderada`);
+    return this.http.get<number>(
+      `${this.apiUrl}/aluno/${alunoId}/media-ponderada`
+    );
   }
 
   listarBoletimPorAluno(alunoId: number): Observable<any[]> {
@@ -41,6 +45,8 @@ export class NotaService {
   }
 
   calcularMediaPorDisciplina(disciplinaId: number): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/disciplina/${disciplinaId}/media-ponderada`);
+    return this.http.get<number>(
+      `${this.apiUrl}/disciplina/${disciplinaId}/media-ponderada`
+    );
   }
 }

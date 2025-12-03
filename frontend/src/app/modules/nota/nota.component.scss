@@ -1,0 +1,61 @@
+.form-control {
+  &.input-erro {
+    border: 2px solid #f44336 !important;
+    box-shadow: 0 0 5px rgba(244, 67, 54, 0.5);
+    background-color: #ffebee;
+
+    &:focus {
+      outline: none;
+      border-color: #d32f2f !important;
+      box-shadow: 0 0 8px rgba(211, 47, 47, 0.8);
+    }
+  }
+
+  &.input-alterado {
+    border: 2px solid #2196f3 !important;
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+    background-color: #e3f2fd;
+
+    &:focus {
+      outline: none;
+      border-color: #1976d2 !important;
+      box-shadow: 0 0 8px rgba(25, 118, 210, 0.8);
+    }
+  }
+}
+
+// Estilos para snackbars
+::ng-deep {
+  .snackbar-sucesso {
+    background-color: #4caf50 !important;
+    color: white !important;
+
+    .mdc-snackbar__label {
+      color: white !important;
+    }
+
+    .mdc-button__label {
+      color: white !important;
+    }
+  }
+
+  .snackbar-erro {
+    background-color: #f44336 !important;
+    color: white !important;
+
+    .mdc-snackbar__label {
+      color: white !important;
+    }
+
+    .mdc-button__label {
+      color: white !important;
+    }
+  }
+
+  // Estilo para spinner dentro do botão
+  mat-spinner {
+    display: inline-block !important;
+    transform: scale(0.5) !important;
+    margin: 0 !important;
+  }
+}

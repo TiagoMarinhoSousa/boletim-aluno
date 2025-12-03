@@ -7,6 +7,7 @@ import {
   DisciplinaService,
   Disciplina,
 } from '../../services/disciplina.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-nota',
@@ -22,6 +23,15 @@ export class NotaComponent implements OnInit {
 
   turmaSelecionada: number | null = null;
   disciplinaSelecionada: number | null = null;
+  
+  // Rastreia inputs com valores inválidos que foram resetados
+  inputsInvalidos: Set<string> = new Set();
+  
+  // Rastreia notas que foram alteradas
+  notasAlteradas: Set<string> = new Set();
+  
+  // Flag para mostrar loading
+  carregando: boolean = false;
 
   colunasTabela: string[] = ['aluno', 'media'];
 
@@ -29,40 +39,55 @@ export class NotaComponent implements OnInit {
     private turmaService: TurmaService,
     private alunoService: AlunoService,
     private disciplinaService: DisciplinaService,
-    private notaService: NotaService
+    private notaService: NotaService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
-    // Carregar turmas e disciplinas do backend
-    this.turmaService
-      .listarTodas()
-      .subscribe((turmas) => (this.turmas = turmas));
-    this.disciplinaService
-      .listarTodas()
-      .subscribe((disciplinas) => (this.disciplinas = disciplinas));
+    // Carrega todas as turmas
+    this.turmaService.listarTodas().subscribe((turmas) => {
+      this.turmas = turmas;
+    });
+
+    // Carrega todas as disciplinas
+    this.disciplinaService.listarTodas().subscribe((disciplinas) => {
+      this.disciplinas = disciplinas;
+    });
   }
 
-  selecionarTurma(turmaId: number) {
+  getValorDoEvento(event: Event): number {
+    const input = event.target as HTMLInputElement;
+    // Se o input tem "-", retorna NaN para forçar validação
+    if (input.value === '-') {
+      return NaN;
+    }
+    return input.valueAsNumber;
+  }
+  selecionarTurma(turmaId: number): void {
     this.turmaSelecionada = turmaId;
-    this.disciplinaSelecionada = null;
-    this.avaliacoes = [];
-    this.notas = [];
-    this.colunasTabela = ['aluno', 'media'];
 
-    // Buscar alunos da turma no backend
     this.turmaService.listarAlunosPorTurma(turmaId).subscribe((alunos) => {
       this.alunos = alunos;
+      this.notas = [];
+
+      this.alunos.forEach((aluno) => {
+        this.notaService.listarPorAluno(aluno.id).subscribe((notasAluno) => {
+          notasAluno.forEach((nota) => this.notas.push(nota));
+        });
+      });
     });
   }
 
   selecionarDisciplina(disciplinaId: number) {
     this.disciplinaSelecionada = disciplinaId;
 
-    // Avaliações fixas (pode ser substituído futuramente por AvaliacaoController)
+    // Avaliações da disciplina selecionada (IDs: 1-3 para disciplina 1, 4-6 para disciplina 2, etc)
+    const avaliacaoIds = this.getAvaliacaoIdsPorDisciplina(disciplinaId);
+    
     this.avaliacoes = [
-      { id: 1, nome: 'Prova', peso: 5, disciplinaId },
-      { id: 2, nome: 'Trabalho', peso: 2, disciplinaId },
-      { id: 3, nome: 'Atividade', peso: 1, disciplinaId },
+      { id: avaliacaoIds[0], descricao: 'Prova', peso: 5, disciplinaId },
+      { id: avaliacaoIds[1], descricao: 'Trabalho', peso: 2, disciplinaId },
+      { id: avaliacaoIds[2], descricao: 'Atividade', peso: 1, disciplinaId },
     ];
 
     this.colunasTabela = [
@@ -74,12 +99,23 @@ export class NotaComponent implements OnInit {
     // Buscar notas de cada aluno no backend
     this.notas = [];
     this.alunos.forEach((aluno) => {
-      this.alunoService
-        .listarNotasPorAluno(aluno.id)
+      this.notaService
+        .listarPorAluno(aluno.id)
         .subscribe((notasAluno) => {
-          notasAluno.forEach((n) => this.notas.push(n));
+          // Filtrar apenas as notas da disciplina selecionada
+          notasAluno.forEach((n) => {
+            if (avaliacaoIds.includes(n.avaliacaoId)) {
+              this.notas.push(n);
+            }
+          });
         });
     });
+  }
+
+  getAvaliacaoIdsPorDisciplina(disciplinaId: number): number[] {
+    // Mapeamento: disciplina 1 -> avaliações 1-3, disciplina 2 -> avaliações 4-6, etc
+    const inicio = (disciplinaId - 1) * 3 + 1;
+    return [inicio, inicio + 1, inicio + 2];
   }
 
   getNotaValor(alunoId: number, avaliacaoId: number): string {
@@ -89,15 +125,45 @@ export class NotaComponent implements OnInit {
     return nota ? nota.valor.toString() : '-';
   }
 
-  atualizarNota(alunoId: number, avaliacaoId: number, event: any) {
-    const valor = +event.target.value;
-    let nota = this.notas.find(
+  atualizarNota(alunoId: number, avaliacaoId: number, valor: number, inputElement?: HTMLInputElement): void {
+    const chave = `${alunoId}-${avaliacaoId}`;
+    
+    // Validação: nota deve estar entre 0 e 10
+    if (valor < 0 || valor > 10 || isNaN(valor)) {
+      alert('Nota deve estar entre 0 e 10');
+      // Marca como inválido
+      this.inputsInvalidos.add(chave);
+      // Remove nota inválida do array
+      const index = this.notas.findIndex(
+        (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
+      );
+      if (index !== -1) {
+        this.notas.splice(index, 1);
+      }
+      // Limpa o input diretamente
+      if (inputElement) {
+        inputElement.value = '';
+      }
+      // Força detecção de mudança
+      this.notas = [...this.notas];
+      return;
+    }
+
+    // Se entrada for válida, remove da marcação de inválido
+    this.inputsInvalidos.delete(chave);
+    // Marca como alterado
+    this.notasAlteradas.add(chave);
+
+    // Buscar nota existente
+    const notaExistente = this.notas.find(
       (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
     );
 
-    if (nota) {
-      nota.valor = valor;
+    if (notaExistente) {
+      // Se existe, sobrescrever o valor
+      notaExistente.valor = valor;
     } else {
+      // Se não existe, criar nova nota
       this.notas.push({ alunoId, avaliacaoId, valor });
     }
   }
@@ -122,8 +188,49 @@ export class NotaComponent implements OnInit {
   }
 
   salvarNotas() {
-    this.notaService.salvarNotasEmLote(this.notas).subscribe(() => {
-      console.log('Notas salvas com sucesso!');
+    // Verifica se há inputs inválidos pendentes
+    if (this.inputsInvalidos.size > 0) {
+      alert('Existem campos com validação pendente. Corrija antes de salvar.');
+      return;
+    }
+
+    // Ativa loading
+    this.carregando = true;
+
+    this.notaService.salvarNotasEmLote(this.notas).subscribe({
+      next: () => {
+        // Desativa loading
+        this.carregando = false;
+        
+        // Limpa rastreamento de alterações após salvar
+        this.notasAlteradas.clear();
+        
+        // Mostra snackbar com sucesso
+        this.snackBar.open('✓ Notas salvas com sucesso!', 'Fechar', {
+          duration: 5000,
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom',
+          panelClass: ['snackbar-sucesso']
+        });
+        
+        console.log('Notas salvas com sucesso!');
+      },
+      error: (erro) => {
+        // Desativa loading
+        this.carregando = false;
+        
+        const mensagem = erro.error?.message || erro.message || 'Erro ao salvar notas';
+        
+        // Mostra snackbar com erro
+        this.snackBar.open('✗ ' + mensagem, 'Fechar', {
+          duration: 7000,
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom',
+          panelClass: ['snackbar-erro']
+        });
+        
+        console.error('Erro ao salvar notas:', erro);
+      }
     });
   }
 }

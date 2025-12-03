@@ -1,6 +1,6 @@
 export interface Avaliacao {
   id: number;
-  nome: string;
+  descricao: string;
   peso: number; // valores de 1 a 5
   disciplinaId: number;
 }

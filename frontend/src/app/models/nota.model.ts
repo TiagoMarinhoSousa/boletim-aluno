@@ -1,6 +1,5 @@
-export interface Nota {
-  id?: number;
-  valor: number; // nota entre 0 e 10
+export interface NotaDTO {
   alunoId: number;
   avaliacaoId: number;
+  valor: number;
 }
