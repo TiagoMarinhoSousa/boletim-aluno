@@ -16,16 +16,6 @@ public class TurmaService {
         this.turmaRepository = turmaRepository;
     }
 
-    public List<Turma> listar() {
-        return turmaRepository.findAll();
-    }
-
-    public Turma salvar(TurmaDTO turmaDTO) {
-        Turma turma = new Turma();
-        turma.setNome(turmaDTO.getNome());
-        return turmaRepository.save(turma);
-    }
-
     public List<Turma> listarTodas() {
         return turmaRepository.findAll();
     }
@@ -34,7 +24,9 @@ public class TurmaService {
         return turmaRepository.findById(id).orElse(null);
     }
 
-    public Turma salvar(Turma turma) {
+    public Turma salvar(TurmaDTO turmaDTO) {
+        Turma turma = new Turma();
+        turma.setNome(turmaDTO.getNome());
         return turmaRepository.save(turma);
     }
 
