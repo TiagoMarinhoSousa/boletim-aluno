@@ -31,4 +31,10 @@ public class NotaController {
     public List<Nota> listarPorAluno(@PathVariable Long alunoId) {
         return notaService.listarPorAluno(alunoId);
     }
+
+    @GetMapping("/aluno/{alunoId}/media-ponderada")
+    public Double calcularMediaPonderadaPorAluno(@PathVariable Long alunoId) {
+        return notaService.calcularMediaPonderadaPorAluno(alunoId);
+    }
+
 }

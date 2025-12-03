@@ -27,7 +27,8 @@ public class AvaliacaoService {
         Avaliacao avaliacao = new Avaliacao();
         avaliacao.setDescricao(avaliacaoDTO.getDescricao());
         avaliacao.setDisciplina(disciplina);
-
+        avaliacao.setPeso(avaliacaoDTO.getPeso());
+   
         return avaliacaoRepository.save(avaliacao);
     }
 

@@ -11,6 +11,8 @@ public class Avaliacao {
     private Long id;
 
     private String descricao;
+    @Column(nullable = false)
+    private int peso;
 
     @ManyToOne
     @JoinColumn(name = "disciplina_id")
@@ -40,5 +42,13 @@ public class Avaliacao {
 
     public void setDisciplina(Disciplina disciplina) {
         this.disciplina = disciplina;
+    }
+
+    public void setPeso(int peso2) {
+        this.peso = peso2;
+    }
+
+    public int getPeso() {
+        return this.peso;
     }
 }

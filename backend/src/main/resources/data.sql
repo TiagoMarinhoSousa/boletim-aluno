@@ -30,24 +30,24 @@ INSERT INTO aluno (nome, turma_id) VALUES ('Beatriz Martins', 2);
 -- AVALIAÇÕES (3 por disciplina: Prova, Trabalho, Atividade)
 -- =========================
 -- Matemática
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Prova Matemática (peso 5)', 1);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Trabalho Matemática (peso 2)', 1);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Atividade Matemática (peso 1)', 1);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Prova Matemática (peso 5)', 1, 5);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Trabalho Matemática (peso 2)', 1, 2);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Atividade Matemática (peso 1)', 1, 1);
 
 -- Português
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Prova Português (peso 5)', 2);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Trabalho Português (peso 2)', 2);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Atividade Português (peso 1)', 2);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Prova Português (peso 5)', 2, 5);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Trabalho Português (peso 2)', 2, 2);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Atividade Português (peso 1)', 2, 1);
 
 -- História
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Prova História (peso 5)', 3);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Trabalho História (peso 2)', 3);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Atividade História (peso 1)', 3);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Prova História (peso 5)', 3, 5);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Trabalho História (peso 2)', 3, 2);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Atividade História (peso 1)', 3, 1);
 
 -- Ciências
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Prova Ciências (peso 5)', 4);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Trabalho Ciências (peso 2)', 4);
-INSERT INTO avaliacao (descricao, disciplina_id) VALUES ('Atividade Ciências (peso 1)', 4);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Prova Ciências (peso 5)', 4, 5);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Trabalho Ciências (peso 2)', 4, 2);
+INSERT INTO avaliacao (descricao, disciplina_id, peso) VALUES ('Atividade Ciências (peso 1)', 4, 1);
 
 -- =========================
 -- NOTAS (Matemática: cada aluno tem 3 notas)
