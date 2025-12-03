@@ -1,24 +1,26 @@
 package br.com.boletim.backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.*;
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Turma {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Nome da turma é obrigatório")
     private String nome;
 
-    @OneToMany(mappedBy = "turma")
-    @JsonManagedReference
-    private List<Aluno> alunos;
+    // Construtores
+    public Turma() {
+    }
 
-    // getters e setters
+    public Turma(String nome) {
+        this.nome = nome;
+    }
+
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -33,13 +35,5 @@ public class Turma {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public List<Aluno> getAlunos() {
-        return alunos;
-    }
-
-    public void setAlunos(List<Aluno> alunos) {
-        this.alunos = alunos;
     }
 }
