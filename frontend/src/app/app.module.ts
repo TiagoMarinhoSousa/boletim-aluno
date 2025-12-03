@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NotaModule } from './modules/nota/nota.module';
+import { RelatorioComponent } from './modules/relatorio/relatorio.component';
 
 @NgModule({
   declarations: [

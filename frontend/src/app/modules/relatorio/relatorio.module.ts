@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotaRoutingModule } from './nota-routing.module';
-import { NotaComponent } from './nota.component';
+import { RelatorioRoutingModule } from './relatorio-routing.module';
+import { RelatorioComponent } from './relatorio.component';
 
 // Angular Material
 import { MatTableModule } from '@angular/material/table';
@@ -11,10 +11,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
-  declarations: [NotaComponent],
+  declarations: [RelatorioComponent],
   imports: [
     CommonModule,
-    NotaRoutingModule,
+    RelatorioRoutingModule,
     MatTableModule,
     MatFormFieldModule,
     MatSelectModule,
@@ -22,4 +22,4 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule
   ]
 })
-export class NotaModule {}
+export class RelatorioModule {}

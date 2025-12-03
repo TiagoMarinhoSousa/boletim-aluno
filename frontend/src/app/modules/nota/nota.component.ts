@@ -1,12 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { TurmaService } from '../../services/turma.service';
-import { AlunoService } from '../../services/aluno.service';
-import { NotaService } from '../../services/nota.service';
-import { Turma } from '../../models/turma.model';
 import { Aluno } from '../../models/aluno.model';
-import { AvaliacaoService } from '../../services/avaliacao.service';
+import { Avaliacao } from '../../models/avaliacao.model';
 import { Nota } from '../../models/nota.model';
-import { Avaliacao } from 'src/app/models/avaliacao.model';
 
 @Component({
   selector: 'app-nota',
@@ -14,65 +9,106 @@ import { Avaliacao } from 'src/app/models/avaliacao.model';
   styleUrls: ['./nota.component.scss'],
 })
 export class NotaComponent implements OnInit {
-  turmas: Turma[] = [];
+  turmas: { id: number; nome: string }[] = [];
+  disciplinas: { id: number; nome: string }[] = [];
   alunos: Aluno[] = [];
   avaliacoes: Avaliacao[] = [];
   notas: Nota[] = [];
 
-  turmaSelecionada?: Turma;
-  colunasTabela: string[] = [];
+  turmaSelecionada: number | null = null;
+  disciplinaSelecionada: number | null = null;
 
-  constructor(
-    private turmaService: TurmaService,
-    private alunoService: AlunoService,
-    private notaService: NotaService
-  ) {}
+  colunasTabela: string[] = ['aluno', 'media']; // inicial
 
   ngOnInit(): void {
-    this.turmaService.listarTurmas().subscribe((t) => (this.turmas = t));
-  }
-
-  selecionarTurma(turma: Turma): void {
-    this.turmaSelecionada = turma;
-
-    this.alunoService
-      .listarPorTurma(turma.id)
-      .subscribe((a) => (this.alunos = a));
-
-    // Exemplo de avaliações fixas (substitua por chamada real ao serviço)
-    this.avaliacoes = [
-      { id: 1, nome: 'Prova 1', peso: 2, disciplinaId: turma.id },
-      { id: 2, nome: 'Trabalho', peso: 1, disciplinaId: turma.id },
-      { id: 3, nome: 'Prova Final', peso: 3, disciplinaId: turma.id },
+    // Mock inicial de turmas e disciplinas
+    this.turmas = [
+      { id: 1, nome: 'Turma A' },
+      { id: 2, nome: 'Turma B' },
     ];
 
+    this.disciplinas = [
+      { id: 1, nome: 'Matemática' },
+      { id: 2, nome: 'Português' },
+      { id: 3, nome: 'História' },
+    ];
+  }
+
+  selecionarTurma(turmaId: number) {
+    this.turmaSelecionada = turmaId;
+
+    // Resetar disciplina ao trocar de turma
+    this.disciplinaSelecionada = null;
+    this.avaliacoes = [];
+    this.notas = [];
+    this.colunasTabela = ['aluno', 'media'];
+
+    // Mock de alunos por turma
+    if (turmaId === 1) {
+      this.alunos = [
+        { id: 1, nome: 'Ana' },
+        { id: 2, nome: 'Pedro' },
+      ];
+    } else if (turmaId === 2) {
+      this.alunos = [
+        { id: 3, nome: 'Carla' },
+        { id: 4, nome: 'Tadeu' },
+      ];
+    }
+  }
+
+  selecionarDisciplina(disciplinaId: number) {
+    this.disciplinaSelecionada = disciplinaId;
+
+    // Definir avaliações fixas
+    this.avaliacoes = [
+      { id: 1, nome: 'Prova', peso: 5, disciplinaId },
+      { id: 2, nome: 'Trabalho', peso: 2, disciplinaId },
+      { id: 3, nome: 'Atividade', peso: 1, disciplinaId },
+    ];
+
+    // Atualizar colunas da tabela com ids únicos
     this.colunasTabela = [
       'aluno',
-      ...this.avaliacoes.map((a) => a.nome),
+      ...this.avaliacoes.map((a) => 'avaliacao-' + a.id),
       'media',
     ];
+
+    // Mock de notas (exemplo simples)
+    this.notas = [];
+    this.alunos.forEach((aluno) => {
+      this.avaliacoes.forEach((avaliacao) => {
+        this.notas.push({
+          alunoId: aluno.id,
+          avaliacaoId: avaliacao.id,
+          valor: Math.floor(Math.random() * 4) + 7, // notas aleatórias 7–10
+        });
+      });
+    });
   }
 
-  atualizarNota(alunoId: number, avaliacaoId: number, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const valor = parseFloat(input.value);
-
-    if (isNaN(valor)) return;
-
-    const notaExistente = this.notas.find(
+  getNotaValor(alunoId: number, avaliacaoId: number): string {
+    const nota = this.notas.find(
       (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
     );
-    if (notaExistente) {
-      notaExistente.valor = valor;
+    return nota ? nota.valor.toString() : '-';
+  }
+
+  atualizarNota(alunoId: number, avaliacaoId: number, event: any) {
+    const valor = +event.target.value;
+    let nota = this.notas.find(
+      (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
+    );
+
+    if (nota) {
+      nota.valor = valor;
     } else {
       this.notas.push({ alunoId, avaliacaoId, valor });
     }
   }
 
-  calcularMedia(alunoId: number): number {
+  calcularMedia(alunoId: number): string {
     const notasAluno = this.notas.filter((n) => n.alunoId === alunoId);
-    if (notasAluno.length === 0) return NaN;
-
     let somaPesos = 0;
     let somaNotas = 0;
 
@@ -84,12 +120,13 @@ export class NotaComponent implements OnInit {
       }
     });
 
-    return somaPesos > 0 ? somaNotas / somaPesos : NaN;
+    if (somaPesos > 0) {
+      return (somaNotas / somaPesos).toFixed(1);
+    }
+    return '-';
   }
 
-  salvarNotas(): void {
-    this.notaService.salvarEmLote(this.notas).subscribe(() => {
-      alert('Notas salvas com sucesso!');
-    });
+  salvarNotas() {
+    console.log('Notas salvas:', this.notas);
   }
 }

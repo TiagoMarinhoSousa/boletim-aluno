@@ -1,0 +1,35 @@
+<h2>Relatório de Médias</h2>
+
+<!-- Médias por aluno -->
+<h3>Médias por Aluno</h3>
+<table mat-table [dataSource]="alunos" class="mat-elevation-z8">
+  <ng-container matColumnDef="aluno">
+    <th mat-header-cell *matHeaderCellDef> Aluno </th>
+    <td mat-cell *matCellDef="let aluno"> {{ aluno.nome }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="media">
+    <th mat-header-cell *matHeaderCellDef> Média </th>
+    <td mat-cell *matCellDef="let aluno"> {{ calcularMediaAluno(aluno.id) }} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="['aluno','media']"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['aluno','media'];"></tr>
+</table>
+
+<!-- Médias por avaliação -->
+<h3>Médias por Avaliação</h3>
+<table mat-table [dataSource]="avaliacoes" class="mat-elevation-z8">
+  <ng-container matColumnDef="avaliacao">
+    <th mat-header-cell *matHeaderCellDef> Avaliação </th>
+    <td mat-cell *matCellDef="let avaliacao"> {{ avaliacao.nome }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="media">
+    <th mat-header-cell *matHeaderCellDef> Média </th>
+    <td mat-cell *matCellDef="let avaliacao"> {{ calcularMediaAvaliacao(avaliacao.id) }} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="['avaliacao','media']"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['avaliacao','media'];"></tr>
+</table>
