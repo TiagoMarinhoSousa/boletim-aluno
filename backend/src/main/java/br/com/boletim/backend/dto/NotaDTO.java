@@ -1,9 +1,20 @@
 package br.com.boletim.backend.dto;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+
 public class NotaDTO {
+    @NotNull(message = "Aluno é obrigatório")
     private Long alunoId;
+
+    @NotNull(message = "Avaliação é obrigatória")
     private Long avaliacaoId;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "Nota mínima é 0")
+    @DecimalMax(value = "10.0", inclusive = true, message = "Nota máxima é 10")
     private Double valor;
+
 
     public NotaDTO() {
     }

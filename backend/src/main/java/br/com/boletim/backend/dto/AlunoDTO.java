@@ -1,6 +1,9 @@
 package br.com.boletim.backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AlunoDTO {
+    @NotBlank(message = "Nome do aluno é obrigatório")
     private String nome;
     private Long turmaId;
 

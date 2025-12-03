@@ -3,6 +3,8 @@ package br.com.boletim.backend.controller;
 import br.com.boletim.backend.domain.Nota;
 import br.com.boletim.backend.dto.NotaDTO;
 import br.com.boletim.backend.service.NotaService;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +20,7 @@ public class NotaController {
     }
 
     @PostMapping
-    public Nota salvar(@RequestBody NotaDTO notaDTO) {
+    public Nota salvar(@Valid @RequestBody NotaDTO notaDTO) {
         return notaService.salvar(notaDTO);
     }
 

@@ -1,9 +1,20 @@
 package br.com.boletim.backend.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class AvaliacaoDTO {
+    @NotBlank(message = "Descrição da avaliação é obrigatória")
     private String descricao;
+    
+    @NotNull(message = "Disciplina é obrigatória")
     private Long disciplinaId;
-    private int peso; // certifique-se de que o campo existe
+
+    @Min(value = 1, message = "Peso mínimo é 1")
+    @Max(value = 10, message = "Peso máximo é 10")
+    private int peso;
 
     public AvaliacaoDTO() {
     }
