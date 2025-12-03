@@ -1,10 +1,12 @@
 package br.com.boletim.backend.dto;
 
+import br.com.boletim.backend.domain.Nota;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 public class NotaDTO {
+
     @NotNull(message = "Aluno é obrigatório")
     private Long alunoId;
 
@@ -15,8 +17,14 @@ public class NotaDTO {
     @DecimalMax(value = "10.0", inclusive = true, message = "Nota máxima é 10")
     private Double valor;
 
-
     public NotaDTO() {
+    }
+
+    // ✅ Construtor que converte Nota para DTO
+    public NotaDTO(Nota nota) {
+        this.alunoId = nota.getAluno().getId();
+        this.avaliacaoId = nota.getAvaliacao().getId();
+        this.valor = nota.getValor();
     }
 
     public Long getAlunoId() {

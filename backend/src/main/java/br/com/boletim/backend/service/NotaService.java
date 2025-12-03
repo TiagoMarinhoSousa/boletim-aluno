@@ -7,7 +7,9 @@ import br.com.boletim.backend.dto.NotaDTO;
 import br.com.boletim.backend.repository.AlunoRepository;
 import br.com.boletim.backend.repository.AvaliacaoRepository;
 import br.com.boletim.backend.repository.NotaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +32,16 @@ public class NotaService {
      * Salva ou sobrescreve a nota de um aluno para uma avaliação.
      */
     public Nota salvar(NotaDTO notaDTO) {
+        // Validação: nota deve estar entre 0 e 10
+        if (notaDTO.getValor() < 0 || notaDTO.getValor() > 10) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nota deve estar entre 0 e 10");
+        }
+
         Aluno aluno = alunoRepository.findById(notaDTO.getAlunoId())
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
 
         Avaliacao avaliacao = avaliacaoRepository.findById(notaDTO.getAvaliacaoId())
-                .orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
         // Verifica se já existe nota para esse aluno e avaliação
         Optional<Nota> existente = notaRepository.findByAlunoIdAndAvaliacaoId(aluno.getId(), avaliacao.getId());
@@ -59,8 +66,11 @@ public class NotaService {
         return notaRepository.findAll();
     }
 
-    public List<Nota> listarPorAluno(Long alunoId) {
-        return notaRepository.findByAlunoId(alunoId);
+    public List<NotaDTO> listarPorAluno(Long alunoId) {
+        List<Nota> notas = notaRepository.findByAlunoId(alunoId);
+        return notas.stream()
+                .map(NotaDTO::new) // usa o construtor que criamos no DTO
+                .toList();
     }
 
     public Double calcularMediaPonderadaPorAluno(Long alunoId) {
@@ -107,6 +117,14 @@ public class NotaService {
     }
 
     public List<Nota> salvarEmLote(List<NotaDTO> notasDTO) {
+        // Validar todas as notas antes de salvar
+        notasDTO.forEach(notaDTO -> {
+            if (notaDTO.getValor() < 0 || notaDTO.getValor() > 10) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    "Nota deve estar entre 0 e 10. Aluno ID: " + notaDTO.getAlunoId() + ", Valor: " + notaDTO.getValor());
+            }
+        });
+
         return notasDTO.stream()
                 .map(this::salvar) // usa a lógica de sobrescrita já existente
                 .toList();

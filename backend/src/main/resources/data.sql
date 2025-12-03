@@ -8,7 +8,7 @@ INSERT INTO turma (nome) VALUES ('Turma B');
 -- DISCIPLINAS
 -- =========================
 INSERT INTO disciplina (nome) VALUES ('Matemática');
-INSERT INTO disciplina (nome) VALUES ('Português');
+INSERT INTO disciplina (nome) VALUES ('Português'); 
 INSERT INTO disciplina (nome) VALUES ('História');
 INSERT INTO disciplina (nome) VALUES ('Ciências');
 

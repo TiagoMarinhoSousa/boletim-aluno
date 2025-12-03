@@ -63,7 +63,7 @@ public class TurmaService {
             List<RelatorioDisciplinaDTO> disciplinasDTO = new ArrayList<>();
 
             for (Disciplina disciplina : aluno.getTurma().getDisciplinas()) {
-                List<Nota> notas = notaRepository.findByAlunoIdAndDisciplinaId(aluno.getId(), disciplina.getId());
+                List<Nota> notas = notaRepository.findByAlunoIdAndAvaliacaoDisciplinaId(aluno.getId(), disciplina.getId());
 
                 double somaNotasXPeso = 0.0;
                 int somaPesos = 0;

@@ -1,1 +1,57 @@
-<router-outlet></router-outlet>
+<!-- Header -->
+<mat-toolbar color="primary" class="app-header">
+  <div class="toolbar-container">
+    <!-- Logo e ícone -->
+    <div class="logo-section">
+      <mat-icon class="logo-icon">school</mat-icon>
+      <span class="app-title">Boletim Escolar</span>
+    </div>
+
+    <!-- Menu de navegação (desktop) -->
+    <nav class="nav-desktop">
+      <button mat-button routerLink="/notas" routerLinkActive="active">
+        <mat-icon>grade</mat-icon>
+        <span>Notas</span>
+      </button>
+      <button mat-button routerLink="/turmas" routerLinkActive="active">
+        <mat-icon>groups</mat-icon>
+        <span>Turmas</span>
+      </button>
+      <button mat-button routerLink="/disciplinas" routerLinkActive="active">
+        <mat-icon>book</mat-icon>
+        <span>Disciplinas</span>
+      </button>
+    </nav>
+
+    <!-- Menu hambúrguer (mobile) -->
+    <button mat-icon-button [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item routerLink="/notas" (click)="menuTrigger.closeMenu()">
+        <mat-icon>grade</mat-icon>
+        <span>Notas</span>
+      </button>
+      <button mat-menu-item routerLink="/turmas" (click)="menuTrigger.closeMenu()">
+        <mat-icon>groups</mat-icon>
+        <span>Turmas</span>
+      </button>
+      <button mat-menu-item routerLink="/disciplinas" (click)="menuTrigger.closeMenu()">
+        <mat-icon>book</mat-icon>
+        <span>Disciplinas</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>
+
+<!-- Conteúdo principal -->
+<div class="content">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <mat-toolbar color="accent">
+    <span>&copy; 2025 Tiago Marinho Sousa. Todos os direitos reservados.</span>
+  </mat-toolbar>
+</footer>

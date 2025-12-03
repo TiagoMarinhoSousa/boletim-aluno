@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NotaComponent } from './modules/nota/nota.component'
+import { TurmaComponent } from './modules/turma/turma.component';
+import { DisciplinaComponent } from './modules/disciplina/disciplina.component';
 
 const routes: Routes = [
-  { path: 'notas', loadChildren: () => import('./modules/nota/nota.module').then(m => m.NotaModule) },
-  { path: 'aluno', loadChildren: () => import('./modules/aluno/aluno.module').then(m => m.AlunoModule) },
-  { path: 'relatorio', loadChildren: () => import('./modules/relatorio/relatorio.module').then(m => m.RelatorioModule) },
+  { path: 'notas', component: NotaComponent },
+  { path: 'turmas', component: TurmaComponent },
+  { path: 'disciplinas', component: DisciplinaComponent },
   { path: '', redirectTo: '/notas', pathMatch: 'full' }
 ];
   

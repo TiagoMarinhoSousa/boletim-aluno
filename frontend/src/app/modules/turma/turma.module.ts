@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { TurmaRoutingModule } from './turma-routing.module';
 import { TurmaComponent } from './turma.component';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { TurmaComponent } from './turma.component';
   ],
   imports: [
     CommonModule,
-    TurmaRoutingModule
+    TurmaRoutingModule,
+    MatIconModule
   ]
 })
 export class TurmaModule { }

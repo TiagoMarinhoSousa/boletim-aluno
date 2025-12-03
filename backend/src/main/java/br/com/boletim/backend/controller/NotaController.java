@@ -35,7 +35,7 @@ public class NotaController {
     }
 
     @GetMapping("/aluno/{alunoId}")
-    public List<Nota> listarPorAluno(@PathVariable Long alunoId) {
+    public List<NotaDTO> listarPorAluno(@PathVariable Long alunoId) {
         return notaService.listarPorAluno(alunoId);
     }
 

@@ -1,0 +1,107 @@
+// Header
+.app-header {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .toolbar-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+    padding: 0 16px;
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    font-size: 18px;
+    min-width: 200px;
+
+    .logo-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .app-title {
+      @media (max-width: 600px) {
+        display: none;
+      }
+    }
+  }
+
+  .nav-desktop {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    margin-left: 32px;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .nav-mobile {
+    display: none;
+    margin-left: auto;
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+}
+
+// Conteúdo principal
+.content {
+  padding: 24px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 200px);
+
+  @media (max-width: 600px) {
+    padding: 16px 8px;
+    min-height: calc(100vh - 180px);
+  }
+}
+
+// Footer
+.app-footer {
+  margin-top: 40px;
+
+  mat-toolbar {
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+
+    span {
+      font-size: 14px;
+      text-align: center;
+
+      @media (max-width: 600px) {
+        font-size: 12px;
+      }
+    }
+  }
+}
