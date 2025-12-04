@@ -137,6 +137,7 @@ boletim-aluno/
 | **Feedback Visual** | ✅ | Snackbars, spinner, highlighting |
 | **Tratamento de Erros** | ✅ | Mensagens claras em português |
 | **Arquitetura Modular** | ✅ | Separação clara de responsabilidades |
+| **Swagger/OpenAPI** | ✅ | Documentação interativa completa da API |
 
 ---
 
@@ -445,6 +446,136 @@ private String atualizadoPor;
 
 ---
 
+## 📚 Documentação Swagger/OpenAPI
+
+### Acesso à Documentação Interativa
+
+Quando o servidor backend está rodando, acesse a documentação completa do Swagger:
+
+**URLs:**
+- **Swagger UI (Interativa):** `http://localhost:8080/swagger-ui.html`
+- **JSON OpenAPI:** `http://localhost:8080/v3/api-docs`
+- **YAML OpenAPI:** `http://localhost:8080/v3/api-docs.yaml`
+
+### Recursos do Swagger
+
+✅ **Documentação Completa:** Todos os endpoints com descrições detalhadas
+✅ **Schemas dos DTOs:** Visualize a estrutura de cada modelo
+✅ **Try it Out:** Teste os endpoints diretamente na interface
+✅ **Códigos de Resposta:** HTTP 200, 400, 404, etc documentados
+✅ **Exemplos:** Valores de exemplo em cada campo
+
+### Exemplo de Uso no Swagger
+
+1. **Abra:** http://localhost:8080/swagger-ui.html
+2. **Expanda** uma seção (ex: "Notas")
+3. **Clique** em um endpoint (ex: POST /notas/lote)
+4. **Clique** em "Try it out"
+5. **Preencha** o formulário ou JSON
+6. **Clique** em "Execute"
+7. **Veja** a resposta em tempo real
+
+### Configuração do Swagger
+
+O Swagger foi configurado com:
+
+**Backend (Java):**
+```java
+// SwaggerConfig.java - Classe de configuração OpenAPI
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Boletim do Aluno - API",
+        version = "1.0.0",
+        description = "API REST com média ponderada"
+    ),
+    servers = {
+        @Server(url = "http://localhost:8080", description = "Local"),
+        @Server(url = "https://api.boletim.com", description = "Produção")
+    }
+)
+```
+
+**Controllers (Anotações):**
+```java
+@RestController
+@Tag(name = "Notas", description = "Gerenciamento de notas")
+public class NotaController {
+
+    @PostMapping("/lote")
+    @Operation(summary = "Salvar notas em lote")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Sucesso"),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
+    public List<Nota> salvarEmLote(@Valid @RequestBody List<NotaDTO> notasDTO) {
+        // ...
+    }
+}
+```
+
+**DTOs (Schemas):**
+```java
+@Schema(description = "DTO para criar/atualizar uma nota")
+public class NotaDTO {
+    @Schema(description = "ID do aluno", example = "1")
+    private Long alunoId;
+    
+    @Schema(description = "Valor da nota (0-10)", example = "8.5")
+    private Double valor;
+}
+```
+
+### Tags de Agrupamento
+
+No Swagger, os endpoints estão organizados em tags:
+
+| Tag | Endpoints | Descrição |
+|---|---|---|
+| **Notas** | 6 endpoints | Gerenciamento principal (salvar, listar, média) |
+| **Turmas** | 5 endpoints | Criação, listagem, alunos |
+| **Disciplinas** | 4 endpoints | Criação, listagem |
+| **Alunos** | 5 endpoints | Criação, listagem, notas |
+| **Avaliações** | 3 endpoints | Criação, listagem por disciplina |
+
+### Validação no Swagger
+
+O Swagger exibe automaticamente as regras de validação:
+
+```
+Nota (valor):
+  - @DecimalMin(0.0) → Mínimo: 0
+  - @DecimalMax(10.0) → Máximo: 10
+  - Required: true
+```
+
+Você pode testar diretamente no Swagger e ver as mensagens de erro:
+
+```json
+// Erro 400 - Nota inválida
+{
+  "timestamp": "2025-12-03T23:37:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Nota máxima é 10"
+}
+```
+
+### Integração com o Frontend
+
+O frontend Angular está configurado para consumir essa API documentada:
+
+```typescript
+// nota.service.ts
+constructor(private http: HttpClient) {}
+
+salvarEmLote(notas: NotaDTO[]): Observable<Nota[]> {
+    // POST http://localhost:8080/notas/lote
+    return this.http.post<Nota[]>(`${this.apiUrl}/notas/lote`, notas);
+}
+```
+
+---
+
 ## 📝 API REST
 
 ### Endpoints Principais
@@ -507,6 +638,7 @@ GET  /notas/aluno/{id}/media-ponderada  - Média
 - **[backend/TESTES.md](backend/TESTES.md)** - Documentação dos testes backend
 - **[backend/TESTES_RESUMO.md](backend/TESTES_RESUMO.md)** - Resumo dos testes backend
 - **[backend/REQUISITO_CONCLUIDO.md](backend/REQUISITO_CONCLUIDO.md)** - Detalhes da implementação
+- **[Swagger UI](http://localhost:8080/swagger-ui.html)** - Documentação interativa da API (servidor deve estar rodando)
 
 ---
 
@@ -614,11 +746,12 @@ Backend:       Spring Boot 3.3.4 com 63 testes ✅
 Frontend:      Angular 16+ com 35 testes ✅
 Integração:    Perfeita ✅
 Documentação:  Completa ✅
+Swagger/OpenAPI: Habilitado e acessível ✅
 Pronto para:   Produção 🚀
 ```
 
 ---
 
 **Última atualização:** 3 de dezembro de 2025  
-**Versão:** 1.0.0  
+**Versão:** 1.0.1  
 **Status:** Production Ready ✅
