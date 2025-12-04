@@ -128,7 +128,7 @@ boletim-aluno/
 | **Cálculo de Média** | ✅ | Média ponderada em tempo real |
 | **Salvamento em Lote** | ✅ | Um clique, valida tudo, salva tudo |
 
-### 🎁 Diferenciais Implementados
+### 🎁 Implementações extras
 
 | Recurso | Status | Detalhes |
 |---|---|---|
@@ -217,21 +217,6 @@ Repository (Acesso a dados)
     ↓
 Domain (Entidades JPA)
 ```
-
-**Exemplo de fluxo:**
-```
-POST /notas/lote
-    ↓
-NotaController.salvarEmLote()
-    ↓
-NotaService.salvarEmLote()
-    - Pré-valida TODAS as notas
-    - Se alguma inválida → erro 400
-    - Se todas válidas → salva todas
-    ↓
-NotaRepository.save()
-```
-
 ### Frontend - Modularização Angular
 
 ```
@@ -268,7 +253,7 @@ atualizarNota(alunoId, avaliacaoId, valor) {
         alert('Nota deve estar entre 0 e 10');
         return;
     }
-    // Adiciona à lista para salvar
+    ...
 }
 
 // 3. Pré-validação antes de enviar
@@ -277,7 +262,7 @@ salvarNotas() {
         alert('Existem campos com validação pendente');
         return;
     }
-    // Envia para backend
+    ...
 }
 ```
 
@@ -319,20 +304,6 @@ notaRepository.save(nota);
 ```
 Média = (Σ nota × peso) / (Σ pesos)
 ```
-
-### Exemplo Prático
-
-```
-Avaliações:
-- Prova:     peso 5,  nota 8.0  →  40
-- Trabalho:  peso 2,  nota 6.0  →  12
-- Atividade: peso 1,  nota 9.0  →  9
-
-Cálculo: (40 + 12 + 9) / (5 + 2 + 1) = 61 / 8 = 7.625 → 7.6
-```
-
-**Resultado:** 7.6 (com 1 casa decimal)
-
 ---
 
 ## 🎨 Interface & UX
@@ -397,6 +368,64 @@ Cálculo: (40 + 12 + 9) / (5 + 2 + 1) = 61 / 8 = 7.625 → 7.6
 
 ---
 
+## 🚀 Roadmap & Próximas Iterações
+
+### 📱 Telas e Fluxos em Desenvolvimento
+
+O projeto foi arquitetado com extensibilidade em mente. Aqui estão as principais melhorias planejadas:
+
+#### **1. Dashboard do Professor**
+```
+
+Funcionalidades:
+✅ Visualizar apenas suas turmas e disciplinas
+✅ Histórico de lançamentos (quem fez, quando, o quê)
+✅ Gráficos de desempenho da turma
+✅ Exportar relatórios em PDF/Excel
+✅ Configurar pesos das avaliações
+```
+
+#### **2. Dashboard do Aluno**
+```
+
+Funcionalidades:
+✅ Visualizar apenas suas notas
+✅ Gráfico de evolução ao longo do bimestre
+✅ Comparação com média da turma (anônima)
+✅ Alertas quando média < 6.0
+✅ Histórico de notas por disciplina
+```
+
+#### **3. Dashboard Administrativo**
+```
+Funcionalidades:
+✅ Criar/editar/deletar usuários (professores, alunos)
+✅ Gerenciar turmas e disciplinas
+✅ Auditoria completa (logs de ações)
+✅ Relatórios de performance por escola
+✅ Backup e restore de dados
+```
+
+### 🔐 Autenticação e Controle de Acesso
+
+Hoje o sistema é um MVP sem autenticação - qualquer pessoa pode ver/editar qualquer nota. Em produção, isso seria um caos! Imagine um aluno alterando suas próprias notas ou um professor vendo as notas de outras turmas que não leciona. Teríamos problemas legais sérios.
+
+#### **Como eu implementaria em um cenário real:**
+
+Primeiro, eu criaria um fluxo bem pensado. O usuário chegaria ao sistema por um formulário de login simples, mas seguro. 
+
+**No Backend:**
+
+Eu adicionaria Spring Security com JWT (JSON Web Tokens). A ideia é simples: quando um professor faz login com email e senha, o backend valida isso contra um banco de dados, e devolve um token JWT. Esse token é como um "bilhete" que o navegador do professor carrega em todas as requisições. A cada requisição, o servidor valida se o token é legítimo e não expirou.
+
+Depois eu criaria um endpoint de login que recebe email e senha, valida contra um usuário no banco, e devolve o JWT.
+
+**No Frontend:**
+
+Eu criaria um serviço de autenticação que guardaria o token no localStorage e o incluiria em todas as requisições HTTP.
+
+---
+
 ## 🔐 Segurança & Escalabilidade
 
 ### Atual (MVP)
@@ -405,44 +434,6 @@ Cálculo: (40 + 12 + 9) / (5 + 2 + 1) = 61 / 8 = 7.625 → 7.6
 - ✅ Tratamento de erros
 - ✅ CORS configurado
 - ⚠️ Sem autenticação
-
-### Próximas Iterações (Futuro)
-
-**Autenticação & Autorização:**
-```java
-// Backend: Adicionar Spring Security
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-    // JWT/OAuth2
-    // Roles: ADMIN, PROFESSOR, ALUNO
-}
-
-// Frontend: HttpInterceptor para token
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-    intercept(req, next) {
-        req = req.clone({
-            setHeaders: { Authorization: `Bearer ${token}` }
-        });
-        return next.handle(req);
-    }
-}
-```
-
-**Auditoria:**
-```java
-// Adicionar campos em Nota
-private LocalDateTime dataCriacao;
-private LocalDateTime dataAtualizacao;
-private String criadoPor;
-private String atualizadoPor;
-```
-
-**Controle de Acesso:**
-- Professores só podem editar suas disciplinas
-- Alunos podem visualizar apenas suas notas
-- Administrador controla tudo
 
 ---
 
@@ -479,51 +470,6 @@ Quando o servidor backend está rodando, acesse a documentação completa do Swa
 
 O Swagger foi configurado com:
 
-**Backend (Java):**
-```java
-// SwaggerConfig.java - Classe de configuração OpenAPI
-@OpenAPIDefinition(
-    info = @Info(
-        title = "Boletim do Aluno - API",
-        version = "1.0.0",
-        description = "API REST com média ponderada"
-    ),
-    servers = {
-        @Server(url = "http://localhost:8080", description = "Local"),
-        @Server(url = "https://api.boletim.com", description = "Produção")
-    }
-)
-```
-
-**Controllers (Anotações):**
-```java
-@RestController
-@Tag(name = "Notas", description = "Gerenciamento de notas")
-public class NotaController {
-
-    @PostMapping("/lote")
-    @Operation(summary = "Salvar notas em lote")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos")
-    })
-    public List<Nota> salvarEmLote(@Valid @RequestBody List<NotaDTO> notasDTO) {
-        // ...
-    }
-}
-```
-
-**DTOs (Schemas):**
-```java
-@Schema(description = "DTO para criar/atualizar uma nota")
-public class NotaDTO {
-    @Schema(description = "ID do aluno", example = "1")
-    private Long alunoId;
-    
-    @Schema(description = "Valor da nota (0-10)", example = "8.5")
-    private Double valor;
-}
-```
 
 ### Tags de Agrupamento
 
@@ -563,16 +509,6 @@ Você pode testar diretamente no Swagger e ver as mensagens de erro:
 ### Integração com o Frontend
 
 O frontend Angular está configurado para consumir essa API documentada:
-
-```typescript
-// nota.service.ts
-constructor(private http: HttpClient) {}
-
-salvarEmLote(notas: NotaDTO[]): Observable<Nota[]> {
-    // POST http://localhost:8080/notas/lote
-    return this.http.post<Nota[]>(`${this.apiUrl}/notas/lote`, notas);
-}
-```
 
 ---
 
@@ -619,16 +555,6 @@ POST /notas/lote             - Salvar em lote
 GET  /notas/aluno/{id}       - Notas do aluno
 GET  /notas/aluno/{id}/media-ponderada  - Média
 ```
-
-**Exemplo POST /notas/lote:**
-```json
-[
-  { "alunoId": 1, "avaliacaoId": 1, "valor": 8.5 },
-  { "alunoId": 1, "avaliacaoId": 2, "valor": 7.0 },
-  { "alunoId": 1, "avaliacaoId": 3, "valor": 9.0 }
-]
-```
-
 ---
 
 ## 📚 Documentação Adicional
@@ -730,26 +656,12 @@ Este projeto está sob a licença MIT. Veja [LICENSE](LICENSE) para detalhes.
 ## 📞 Suporte
 
 Encontrou algum problema? 
-
+(11)94140-3727
 **Opções:**
 1. Abra uma [Issue](../../issues) no GitHub
 2. Veja exemplos em [VERIFICACAO_COMPLETA.md](VERIFICACAO_COMPLETA.md)
 
 ---
-
-## 🎉 Status do Projeto
-
-```
-✅ COMPLETO E FUNCIONAL
-
-Backend:       Spring Boot 3.3.4 com 63 testes ✅
-Frontend:      Angular 16+ com 35 testes ✅
-Integração:    Perfeita ✅
-Documentação:  Completa ✅
-Swagger/OpenAPI: Habilitado e acessível ✅
-Pronto para:   Produção 🚀
-```
-
 ---
 
 **Última atualização:** 3 de dezembro de 2025  
