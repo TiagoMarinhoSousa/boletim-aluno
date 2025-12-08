@@ -31,21 +31,19 @@ public class AlunoService {
     }
 
  public Aluno salvar(AlunoDTO alunoDTO) {
-    if (alunoDTO == null || alunoDTO.getNome() == null || alunoDTO.getNome().trim().isEmpty()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do aluno é obrigatório");
+    String nomeAluno = alunoDTO.getNome();
+    Long turmaId = alunoDTO.getTurmaId();
+
+    // Validação explícita para satisfazer a análise estática e garantir robustez.
+    if (nomeAluno == null || turmaId == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do aluno e ID da turma não podem ser nulos.");
     }
 
-    if (alunoDTO.getTurmaId() == null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "turmaId é obrigatório");
-    }
-
-    System.out.println("DTO recebido: nome=" + alunoDTO.getNome() + ", turmaId=" + alunoDTO.getTurmaId());
-
-    Turma turma = turmaRepository.findById(alunoDTO.getTurmaId())
+    Turma turma = turmaRepository.findById(turmaId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada"));
 
     Aluno aluno = new Aluno();
-    aluno.setNome(alunoDTO.getNome());
+    aluno.setNome(nomeAluno);
     aluno.setTurma(turma);
 
     return alunoRepository.save(aluno);
@@ -53,10 +51,20 @@ public class AlunoService {
 
 
     public Aluno buscarPorId(Long id) {
-        return alunoRepository.findById(id).orElse(null);
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID do aluno não pode ser nulo.");
+        }
+        return alunoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado com o ID: " + id));
     }
 
     public void deletar(Long id) {
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID do aluno não pode ser nulo.");
+        }
+        if (!alunoRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado com o ID: " + id);
+        }
         alunoRepository.deleteById(id);
     }
 

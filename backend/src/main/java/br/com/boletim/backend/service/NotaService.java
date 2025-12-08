@@ -9,6 +9,7 @@ import br.com.boletim.backend.repository.AvaliacaoRepository;
 import br.com.boletim.backend.repository.NotaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -32,15 +33,24 @@ public class NotaService {
      * Salva ou sobrescreve a nota de um aluno para uma avaliação.
      */
     public Nota salvar(NotaDTO notaDTO) {
+        Long alunoId = notaDTO.getAlunoId();
+        Long avaliacaoId = notaDTO.getAvaliacaoId();
+        Double valorNota = notaDTO.getValor();
+
+        // Validação explícita de nulidade para garantir type safety
+        if (alunoId == null || avaliacaoId == null || valorNota == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDs de aluno, avaliação e o valor da nota não podem ser nulos.");
+        }
+
         // Validação: nota deve estar entre 0 e 10
-        if (notaDTO.getValor() < 0 || notaDTO.getValor() > 10) {
+        if (valorNota < 0 || valorNota > 10) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nota deve estar entre 0 e 10");
         }
 
-        Aluno aluno = alunoRepository.findById(notaDTO.getAlunoId())
+        Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
 
-        Avaliacao avaliacao = avaliacaoRepository.findById(notaDTO.getAvaliacaoId())
+        Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
         // Verifica se já existe nota para esse aluno e avaliação
@@ -50,13 +60,13 @@ public class NotaService {
         if (existente.isPresent()) {
             // sobrescreve a nota existente
             nota = existente.get();
-            nota.setValor(notaDTO.getValor());
+            nota.setValor(valorNota);
         } else {
             // cria nova nota
             nota = new Nota();
             nota.setAluno(aluno);
             nota.setAvaliacao(avaliacao);
-            nota.setValor(notaDTO.getValor());
+            nota.setValor(valorNota);
         }
 
         return notaRepository.save(nota);
@@ -116,17 +126,10 @@ public class NotaService {
         return somaPesos == 0 ? 0.0 : somaNotasXPeso / somaPesos;
     }
 
+    @Transactional
     public List<Nota> salvarEmLote(List<NotaDTO> notasDTO) {
-        // Validar todas as notas antes de salvar
-        notasDTO.forEach(notaDTO -> {
-            if (notaDTO.getValor() < 0 || notaDTO.getValor() > 10) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
-                    "Nota deve estar entre 0 e 10. Aluno ID: " + notaDTO.getAlunoId() + ", Valor: " + notaDTO.getValor());
-            }
-        });
-
         return notasDTO.stream()
-                .map(this::salvar) // usa a lógica de sobrescrita já existente
+                .map(this::salvar) // Reutiliza o método salvar, que agora contém toda a validação.
                 .toList();
     }
 

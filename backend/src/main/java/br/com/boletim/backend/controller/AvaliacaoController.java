@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class AvaliacaoController {
         @ApiResponse(responseCode = "200", description = "Avaliação criada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
-    public Avaliacao salvar(@RequestBody AvaliacaoDTO avaliacaoDTO) {
+    public Avaliacao salvar(@Valid @RequestBody AvaliacaoDTO avaliacaoDTO) {
         return avaliacaoService.salvar(avaliacaoDTO);
     }
 

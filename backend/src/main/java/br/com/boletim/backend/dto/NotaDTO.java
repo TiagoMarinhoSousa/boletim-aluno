@@ -17,6 +17,7 @@ public class NotaDTO {
     @Schema(description = "ID da avaliação", example = "1")
     private Long avaliacaoId;
 
+    @NotNull(message = "Valor da nota é obrigatório")
     @DecimalMin(value = "0.0", inclusive = true, message = "Nota mínima é 0")
     @DecimalMax(value = "10.0", inclusive = true, message = "Nota máxima é 10")
     @Schema(description = "Valor da nota (0-10)", example = "8.5")

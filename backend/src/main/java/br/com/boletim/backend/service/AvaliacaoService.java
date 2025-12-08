@@ -6,7 +6,9 @@ import br.com.boletim.backend.dto.AvaliacaoDTO;
 import br.com.boletim.backend.repository.AvaliacaoRepository;
 import br.com.boletim.backend.repository.DisciplinaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.http.HttpStatus;
 import java.util.List;
 
 @Service
@@ -21,14 +23,20 @@ public class AvaliacaoService {
     }
 
     public Avaliacao salvar(AvaliacaoDTO avaliacaoDTO) {
-        Disciplina disciplina = disciplinaRepository.findById(avaliacaoDTO.getDisciplinaId())
-                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+        Long disciplinaId = avaliacaoDTO.getDisciplinaId();
+        String descricao = avaliacaoDTO.getDescricao();
+
+        // Validação explícita para garantir null-safety e robustez
+        if (disciplinaId == null || descricao == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Descrição e ID da disciplina são obrigatórios.");
+        }
+
+        Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada com o ID: " + disciplinaId));
 
         Avaliacao avaliacao = new Avaliacao();
-        avaliacao.setDescricao(avaliacaoDTO.getDescricao());
+        avaliacao.setDescricao(descricao);
         avaliacao.setDisciplina(disciplina);
-
-        // ⚡ Aqui estava faltando:
         avaliacao.setPeso(avaliacaoDTO.getPeso());
 
         return avaliacaoRepository.save(avaliacao);
@@ -39,6 +47,9 @@ public class AvaliacaoService {
     }
 
     public List<Avaliacao> listarPorDisciplina(Long disciplinaId) {
+        if (disciplinaId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID da disciplina não pode ser nulo.");
+        }
         return avaliacaoRepository.findByDisciplinaId(disciplinaId);
     }
 }

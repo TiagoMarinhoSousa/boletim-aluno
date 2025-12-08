@@ -2,13 +2,15 @@ package br.com.boletim.backend.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "DTO para criar/atualizar um aluno")
 public class AlunoDTO {
     @NotBlank(message = "Nome do aluno é obrigatório")
     @Schema(description = "Nome completo do aluno", example = "João Silva")
     private String nome;
-    
+
+    @NotNull(message = "ID da turma é obrigatório")
     @Schema(description = "ID da turma", example = "1")
     private Long turmaId;
 

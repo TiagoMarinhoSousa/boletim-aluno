@@ -10,9 +10,12 @@ import br.com.boletim.backend.dto.TurmaDTO;
 import br.com.boletim.backend.repository.AlunoRepository;
 import br.com.boletim.backend.repository.NotaRepository;
 import br.com.boletim.backend.repository.TurmaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -35,16 +38,31 @@ public class TurmaService {
     }
 
     public Turma buscarPorId(Long id) {
-        return turmaRepository.findById(id).orElse(null);
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID da turma não pode ser nulo.");
+        }
+        return turmaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada com o ID: " + id));
     }
 
     public Turma salvar(TurmaDTO turmaDTO) {
+        String nome = turmaDTO.getNome();
+        if (nome == null || nome.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O nome da turma é obrigatório.");
+        }
+
         Turma turma = new Turma();
-        turma.setNome(turmaDTO.getNome());
+        turma.setNome(nome);
         return turmaRepository.save(turma);
     }
 
     public void deletar(Long id) {
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID da turma não pode ser nulo.");
+        }
+        if (!turmaRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada com o ID: " + id);
+        }
         turmaRepository.deleteById(id);
     }
 
@@ -52,6 +70,16 @@ public class TurmaService {
      * Gera relatório consolidado da turma: lista alunos e suas médias por disciplina.
      */
     public List<RelatorioAlunoDTO> gerarRelatorio(Long turmaId) {
+        if (turmaId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID da turma não pode ser nulo.");
+        }
+
+        // Garante que a turma existe antes de prosseguir
+        if (!turmaRepository.existsById(turmaId)) {
+            // Retorna uma lista vazia se a turma não for encontrada, pois é um relatório
+            return Collections.emptyList();
+        }
+
         List<Aluno> alunos = alunoRepository.findByTurmaId(turmaId);
         List<RelatorioAlunoDTO> relatorio = new ArrayList<>();
 
