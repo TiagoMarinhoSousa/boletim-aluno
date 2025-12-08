@@ -146,7 +146,12 @@ export class NotaComponent implements OnInit {
 
     // Validação: nota deve estar entre 0 e 10
     if (valor < 0 || valor > 10) {
-      alert('Nota deve estar entre 0 e 10');
+      this.snackBar.open('✗ Nota deve estar entre 0 e 10', 'Fechar', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'bottom',
+        panelClass: ['snackbar-erro'],
+      });
       // Marca como inválido
       this.inputsInvalidos.add(chave);
       // Remove nota inválida do array
@@ -206,7 +211,12 @@ export class NotaComponent implements OnInit {
   salvarNotas() {
     // Verifica se há inputs inválidos pendentes
     if (this.inputsInvalidos.size > 0) {
-      alert('Existem campos com validação pendente. Corrija antes de salvar.');
+      this.snackBar.open('✗ Existem campos com validação pendente. Corrija antes de salvar.', 'Fechar', {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'bottom',
+        panelClass: ['snackbar-erro'],
+      });
       return;
     }
 
