@@ -1,10 +1,13 @@
 package br.com.boletim.backend.controller;
 
 import br.com.boletim.backend.domain.Disciplina;
+import br.com.boletim.backend.dto.ErrorResponseDTO; // Adicionado
 import br.com.boletim.backend.dto.DisciplinaDTO;
 import br.com.boletim.backend.service.DisciplinaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content; // Adicionado
+import io.swagger.v3.oas.annotations.media.Schema; // Adicionado
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,8 +28,10 @@ public class DisciplinaController {
     @PostMapping
     @Operation(summary = "Criar nova disciplina", description = "Cria uma nova disciplina no sistema")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Disciplina criada com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos")
+ @ApiResponse(responseCode = "200", description = "Disciplina criada com sucesso"),
+ @ApiResponse(responseCode = "400", description = "Dados inválidos",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public Disciplina salvar(@RequestBody DisciplinaDTO disciplinaDTO) {
         return disciplinaService.salvar(disciplinaDTO);
@@ -42,8 +47,10 @@ public class DisciplinaController {
     @GetMapping("/{id}")
     @Operation(summary = "Buscar disciplina por ID", description = "Retorna os detalhes de uma disciplina específica")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Disciplina encontrada"),
-        @ApiResponse(responseCode = "404", description = "Disciplina não encontrada")
+ @ApiResponse(responseCode = "200", description = "Disciplina encontrada"),
+ @ApiResponse(responseCode = "404", description = "Disciplina não encontrada",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public Disciplina buscarPorId(@Parameter(description = "ID da disciplina") @PathVariable Long id) {
         return disciplinaService.buscarPorId(id);
@@ -53,7 +60,9 @@ public class DisciplinaController {
     @Operation(summary = "Deletar disciplina", description = "Remove uma disciplina do sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Disciplina deletada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Disciplina não encontrada")
+ @ApiResponse(responseCode = "404", description = "Disciplina não encontrada",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public void deletar(@Parameter(description = "ID da disciplina") @PathVariable Long id) {
         disciplinaService.deletar(id);

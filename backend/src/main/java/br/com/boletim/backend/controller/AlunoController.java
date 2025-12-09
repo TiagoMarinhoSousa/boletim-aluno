@@ -2,10 +2,13 @@ package br.com.boletim.backend.controller;
 
 import br.com.boletim.backend.domain.Aluno;
 import br.com.boletim.backend.domain.Nota;
+import br.com.boletim.backend.dto.ErrorResponseDTO; // Adicionado
 import br.com.boletim.backend.dto.AlunoDTO;
 import br.com.boletim.backend.service.AlunoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content; // Adicionado
+import io.swagger.v3.oas.annotations.media.Schema; // Adicionado
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +38,10 @@ public class AlunoController {
     @GetMapping("/{id}")
     @Operation(summary = "Buscar aluno por ID", description = "Retorna os detalhes de um aluno específico")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Aluno encontrado"),
-        @ApiResponse(responseCode = "404", description = "Aluno não encontrado")
+ @ApiResponse(responseCode = "200", description = "Aluno encontrado"),
+ @ApiResponse(responseCode = "404", description = "Aluno não encontrado",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public Aluno buscarPorId(@Parameter(description = "ID do aluno") @PathVariable Long id) {
         return alunoService.buscarPorId(id);
@@ -45,8 +50,10 @@ public class AlunoController {
     @PostMapping
     @Operation(summary = "Criar novo aluno", description = "Cria um novo aluno no sistema")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Aluno criado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos")
+ @ApiResponse(responseCode = "200", description = "Aluno criado com sucesso"),
+ @ApiResponse(responseCode = "400", description = "Dados inválidos",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public Aluno salvar(@Valid @RequestBody AlunoDTO alunoDTO) {
         return alunoService.salvar(alunoDTO);
@@ -56,7 +63,9 @@ public class AlunoController {
     @Operation(summary = "Deletar aluno", description = "Remove um aluno do sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Aluno deletado com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Aluno não encontrado")
+ @ApiResponse(responseCode = "404", description = "Aluno não encontrado",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public void deletar(@Parameter(description = "ID do aluno") @PathVariable Long id) {
         alunoService.deletar(id);
@@ -65,8 +74,10 @@ public class AlunoController {
     @GetMapping("/{id}/notas")
     @Operation(summary = "Listar notas de um aluno", description = "Retorna todas as notas cadastradas de um aluno específico")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Notas recuperadas com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Aluno não encontrado")
+ @ApiResponse(responseCode = "200", description = "Notas recuperadas com sucesso"),
+ @ApiResponse(responseCode = "404", description = "Aluno não encontrado",
+ content = @Content(mediaType = "application/json",
+ schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public List<Nota> listarNotasPorAluno(@Parameter(description = "ID do aluno") @PathVariable Long id) {
         return alunoService.buscarNotasPorAluno(id);
