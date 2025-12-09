@@ -109,6 +109,7 @@ class NotaServiceTest {
 
     // ========== TESTES DE VALIDAÇÃO ==========
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve rejeitar nota menor que 0")
     void deveRejtarNotaMenorQueZero() {
@@ -126,6 +127,7 @@ class NotaServiceTest {
         assertTrue(exception.getReason().contains("Nota deve estar entre 0 e 10"));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve rejeitar nota maior que 10")
     void deveRejtarNotaMaiorQueDez() {
@@ -143,6 +145,7 @@ class NotaServiceTest {
         assertTrue(exception.getReason().contains("Nota deve estar entre 0 e 10"));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve aceitar nota igual a 0")
     void deveAceitarNotaIgualAZero() {
@@ -162,6 +165,7 @@ class NotaServiceTest {
         verify(notaRepository, times(1)).save(any(Nota.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve aceitar nota igual a 10")
     void deveAceitarNotaIgualADez() {
@@ -181,6 +185,7 @@ class NotaServiceTest {
         verify(notaRepository, times(1)).save(any(Nota.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve aceitar nota com valor intermediário válido")
     void deveAceitarNotaIntermediariaValida() {
@@ -200,6 +205,7 @@ class NotaServiceTest {
         verify(notaRepository, times(1)).save(any(Nota.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve lançar exceção para aluno não encontrado")
     void deveLancarExcecaoAlunoNaoEncontrado() {
@@ -219,6 +225,7 @@ class NotaServiceTest {
         assertTrue(exception.getReason().contains("Aluno não encontrado"));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve lançar exceção para avaliação não encontrada")
     void deveLancarExcecaoAvaliacaoNaoEncontrada() {
@@ -349,6 +356,7 @@ class NotaServiceTest {
 
     // ========== TESTES DE CRIAÇÃO E ATUALIZAÇÃO ==========
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve criar nova nota quando não existe")
     void deveCriarNovaNotaQuandoNaoExiste() {
@@ -368,6 +376,7 @@ class NotaServiceTest {
         verify(notaRepository, times(1)).save(any(Nota.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve atualizar nota existente")
     void deveAtualizarNotaExistente() {
@@ -391,6 +400,7 @@ class NotaServiceTest {
 
     // ========== TESTES DE SALVAMENTO EM LOTE ==========
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve salvar múltiplas notas em lote")
     void deveSalvarMultiplasNotasEmLote() {
@@ -421,6 +431,7 @@ class NotaServiceTest {
         verify(notaRepository, times(2)).save(any(Nota.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve rejeitar lote se uma nota for inválida")
     void deveRejtarLoteSeUmaNotaInvalida() {
@@ -448,6 +459,7 @@ class NotaServiceTest {
         assertTrue(exception.getReason().contains("Nota deve estar entre 0 e 10"));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve rejeitar lote se primeira nota for inválida")
     void deveRejtarLoteSeFirstNotaInvalida() {
