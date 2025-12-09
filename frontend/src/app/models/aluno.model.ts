@@ -1,5 +1,7 @@
+import { Turma } from './turma.model';
+
 export interface Aluno {
   id: number;
   nome: string;
-  turmaId?: number; // opcional, caso precise referenciar a turma
+  turma: Turma; // Assumindo que o backend retorna a turma completa ou apenas o ID
 }

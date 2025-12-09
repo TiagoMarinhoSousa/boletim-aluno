@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TurmaService } from '../../services/turma.service';
 import { AlunoService } from '../../services/aluno.service';
+import { Turma } from '../../models/turma.model'; // Importar Turma
+import { Aluno } from '../../models/aluno.model'; // Importar Aluno
 import { NotaService, NotaDTO } from '../../services/nota.service';
 import { Avaliacao } from '../../models/avaliacao.model';
 import {
@@ -15,9 +17,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./nota.component.scss'],
 })
 export class NotaComponent implements OnInit {
-  turmas: any[] = [];
+  turmas: Turma[] = [];
   disciplinas: Disciplina[] = [];
-  alunos: any[] = [];
+  alunos: Aluno[] = [];
   avaliacoes: Avaliacao[] = [];
   notas: NotaDTO[] = [];
 
