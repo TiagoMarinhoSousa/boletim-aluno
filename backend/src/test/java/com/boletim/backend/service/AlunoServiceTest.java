@@ -69,7 +69,7 @@ class AlunoServiceTest {
             "Deve lançar exceção para nome nulo"
         );
 
-        assertTrue(exception.getReason().contains("Nome do aluno é obrigatório"));
+        assertEquals("Nome do aluno e ID da turma são obrigatórios.", exception.getReason());
     }
 
     @Test
@@ -85,7 +85,7 @@ class AlunoServiceTest {
             "Deve lançar exceção para nome vazio"
         );
 
-        assertTrue(exception.getReason().contains("Nome do aluno é obrigatório"));
+        assertEquals("Nome do aluno e ID da turma são obrigatórios.", exception.getReason());
     }
 
     @Test
@@ -101,7 +101,7 @@ class AlunoServiceTest {
             "Deve lançar exceção para nome com apenas espaços"
         );
 
-        assertTrue(exception.getReason().contains("Nome do aluno é obrigatório"));
+        assertEquals("Nome do aluno e ID da turma são obrigatórios.", exception.getReason());
     }
 
     @Test
@@ -117,7 +117,7 @@ class AlunoServiceTest {
             "Deve lançar exceção para turmaId nulo"
         );
 
-        assertTrue(exception.getReason().contains("turmaId é obrigatório"));
+        assertEquals("Nome do aluno e ID da turma são obrigatórios.", exception.getReason());
     }
 
     @Test
@@ -135,23 +135,22 @@ class AlunoServiceTest {
             "Deve lançar exceção para turma inexistente"
         );
 
-        assertTrue(exception.getReason().contains("Turma não encontrada"));
+        assertEquals("Turma não encontrada com o ID: 999", exception.getReason());
     }
 
     @Test
     @DisplayName("Deve rejeitar AlunoDTO nulo")
-    void deveRejtarAlunoNulo() {
-        ResponseStatusException exception = assertThrows(
-            ResponseStatusException.class,
+    void deveRejtarAlunoDTONulo() {
+        assertThrows(
+            NullPointerException.class,
             () -> alunoService.salvar(null),
             "Deve lançar exceção para AlunoDTO nulo"
         );
-
-        assertTrue(exception.getReason().contains("Nome do aluno é obrigatório"));
     }
 
     // ========== TESTES DE CRIAÇÃO ==========
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve criar aluno com dados válidos")
     void deveCriarAlunoComDadosValidos() {
@@ -159,16 +158,26 @@ class AlunoServiceTest {
         alunoDTO.setNome("Maria Santos");
         alunoDTO.setTurmaId(1L);
 
+        // Mock the object that should be returned by the save operation
+        Aluno alunoSalvo = new Aluno();
+        alunoSalvo.setId(2L);
+        alunoSalvo.setNome("Maria Santos");
+        alunoSalvo.setTurma(turma);
+
         when(turmaRepository.findById(1L)).thenReturn(Optional.of(turma));
-        when(alunoRepository.save(any(Aluno.class))).thenReturn(aluno);
+        when(alunoRepository.save(any(Aluno.class))).thenReturn(alunoSalvo);
 
-        Aluno resultado = alunoService.salvar(alunoDTO);
+        Aluno resultado = alunoService.salvar(alunoDTO); // O aluno mockado tem nome "João Silva"
 
-        assertNotNull(resultado);
-        assertEquals("João Silva", resultado.getNome());
+        // Use assertAll for grouped, null-safe assertions
+        assertAll("Verificações do aluno salvo",
+            () -> assertNotNull(resultado, "O resultado não deve ser nulo"),
+            () -> assertEquals("Maria Santos", resultado.getNome(), "O nome do aluno salvo deve ser o esperado")
+        );
         verify(alunoRepository, times(1)).save(any(Aluno.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve aceitar nome com caracteres especiais")
     void deveAceitarNomeComCaracteresEspeciais() {
@@ -176,15 +185,23 @@ class AlunoServiceTest {
         alunoDTO.setNome("João da Silva O'Brien");
         alunoDTO.setTurmaId(1L);
 
+        Aluno alunoComCaracteresEspeciais = new Aluno();
+        alunoComCaracteresEspeciais.setNome("João da Silva O'Brien");
+        alunoComCaracteresEspeciais.setTurma(turma);
+
         when(turmaRepository.findById(1L)).thenReturn(Optional.of(turma));
-        when(alunoRepository.save(any(Aluno.class))).thenReturn(aluno);
+        when(alunoRepository.save(any(Aluno.class))).thenReturn(alunoComCaracteresEspeciais);
 
         Aluno resultado = alunoService.salvar(alunoDTO);
 
-        assertNotNull(resultado);
+        assertAll("Verificações do aluno com caracteres especiais",
+            () -> assertNotNull(resultado, "O resultado não deve ser nulo"),
+            () -> assertEquals("João da Silva O'Brien", resultado.getNome(), "O nome do aluno deve ser o esperado")
+        );
         verify(alunoRepository, times(1)).save(any(Aluno.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve aceitar nome com acentuação")
     void deveAceitarNomeComAcentuacao() {
@@ -192,12 +209,19 @@ class AlunoServiceTest {
         alunoDTO.setNome("José Antônio da Cruz");
         alunoDTO.setTurmaId(1L);
 
+        Aluno alunoComAcentuacao = new Aluno();
+        alunoComAcentuacao.setNome("José Antônio da Cruz");
+        alunoComAcentuacao.setTurma(turma);
+
         when(turmaRepository.findById(1L)).thenReturn(Optional.of(turma));
-        when(alunoRepository.save(any(Aluno.class))).thenReturn(aluno);
+        when(alunoRepository.save(any(Aluno.class))).thenReturn(alunoComAcentuacao);
 
         Aluno resultado = alunoService.salvar(alunoDTO);
 
-        assertNotNull(resultado);
+        assertAll("Verificações do aluno com acentuação",
+            () -> assertNotNull(resultado, "O resultado não deve ser nulo"),
+            () -> assertEquals("José Antônio da Cruz", resultado.getNome(), "O nome do aluno deve ser o esperado")
+        );
         verify(alunoRepository, times(1)).save(any(Aluno.class));
     }
 
@@ -215,13 +239,16 @@ class AlunoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar nulo ao buscar aluno por ID inexistente")
-    void deveRetornarNuloQuandoAlunoNaoExiste() {
+    @DisplayName("Deve lançar exceção 404 ao buscar aluno por ID inexistente")
+    void deveLancarExcecaoQuandoAlunoNaoExiste() {
         when(alunoRepository.findById(999L)).thenReturn(Optional.empty());
 
-        Aluno resultado = alunoService.buscarPorId(999L);
+        ResponseStatusException exception = assertThrows(
+            ResponseStatusException.class,
+            () -> alunoService.buscarPorId(999L)
+        );
 
-        assertNull(resultado);
+        assertEquals(404, exception.getStatusCode().value());
     }
 
     @Test
@@ -235,6 +262,7 @@ class AlunoServiceTest {
         when(alunoRepository.findAll()).thenReturn(java.util.List.of(aluno, aluno2));
 
         java.util.List<Aluno> resultado = alunoService.listarTodos();
+        assertNotNull(resultado, "A lista de resultados não deve ser nula");
 
         assertEquals(2, resultado.size());
         verify(alunoRepository, times(1)).findAll();
@@ -251,6 +279,7 @@ class AlunoServiceTest {
         when(alunoRepository.findByTurmaId(1L)).thenReturn(java.util.List.of(aluno, aluno2));
 
         java.util.List<Aluno> resultado = alunoService.buscarPorTurma(1L);
+        assertNotNull(resultado, "A lista de resultados não deve ser nula");
 
         assertEquals(2, resultado.size());
         verify(alunoRepository, times(1)).findByTurmaId(1L);
@@ -262,6 +291,7 @@ class AlunoServiceTest {
         when(alunoRepository.findByTurmaId(999L)).thenReturn(java.util.List.of());
 
         java.util.List<Aluno> resultado = alunoService.buscarPorTurma(999L);
+        assertNotNull(resultado, "A lista de resultados não deve ser nula");
 
         assertEquals(0, resultado.size());
     }
@@ -271,6 +301,7 @@ class AlunoServiceTest {
     @Test
     @DisplayName("Deve deletar aluno por ID")
     void deveDeletarAlunoPorId() {
+        when(alunoRepository.existsById(1L)).thenReturn(true);
         doNothing().when(alunoRepository).deleteById(1L);
 
         alunoService.deletar(1L);

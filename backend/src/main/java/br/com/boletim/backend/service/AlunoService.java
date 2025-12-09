@@ -35,8 +35,8 @@ public class AlunoService {
     Long turmaId = alunoDTO.getTurmaId();
 
     // Validação explícita para satisfazer a análise estática e garantir robustez.
-    if (nomeAluno == null || turmaId == null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do aluno e ID da turma não podem ser nulos.");
+    if (nomeAluno == null || nomeAluno.isBlank() || turmaId == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do aluno e ID da turma são obrigatórios.");
     }
 
     Turma turma = turmaRepository.findById(turmaId)

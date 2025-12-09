@@ -124,7 +124,7 @@ class NotaServiceUnitTest {
             "Deve lançar exceção para nota negativa"
         );
 
-        assertTrue(exception.getReason().contains("Nota deve estar entre 0 e 10"));
+        assertEquals("Nota deve estar entre 0 e 10", exception.getReason(), "A mensagem de erro para nota negativa está incorreta.");
     }
 
     @Test
@@ -141,7 +141,7 @@ class NotaServiceUnitTest {
             "Deve lançar exceção para nota > 10"
         );
 
-        assertTrue(exception.getReason().contains("Nota deve estar entre 0 e 10"));
+        assertEquals("Nota deve estar entre 0 e 10", exception.getReason(), "A mensagem de erro para nota acima de 10 está incorreta.");
     }
 
     // ========== TESTES DE CÁLCULO DE MÉDIA PONDERADA ==========
@@ -252,6 +252,7 @@ class NotaServiceUnitTest {
         assertEquals(0.0, media, "Média deve ser 0.0 para disciplina sem notas");
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve salvar múltiplas notas em lote com validação")
     void deveSalvarMultiplasNotasEmLote() {
@@ -278,10 +279,12 @@ class NotaServiceUnitTest {
 
         List<Nota> resultado = notaService.salvarEmLote(notasDTOs);
 
+        assertNotNull(resultado, "A lista de resultados não deve ser nula");
         assertEquals(2, resultado.size(), "Deve salvar 2 notas");
         verify(notaRepository, times(2)).save(any(Nota.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     @DisplayName("Deve rejeitar lote se uma nota for inválida (pré-validação)")
     void deveRejtarLoteSeUmaNotaInvalida() {
@@ -306,7 +309,7 @@ class NotaServiceUnitTest {
             "Deve rejeitar lote com nota inválida antes de salvar"
         );
 
-        assertTrue(exception.getReason().contains("Nota deve estar entre 0 e 10"));
+        assertEquals("Nota deve estar entre 0 e 10", exception.getReason(), "A mensagem de erro para lote inválido está incorreta.");
         verify(notaRepository, never()).save(any(Nota.class));
     }
 
@@ -318,6 +321,7 @@ class NotaServiceUnitTest {
 
         List<NotaDTO> resultado = notaService.listarPorAluno(1L);
 
+        assertNotNull(resultado, "A lista de resultados não deve ser nula");
         assertEquals(3, resultado.size(), "Deve retornar 3 notas");
         assertNotNull(resultado.get(0), "Primeira nota não deve ser nula");
     }
