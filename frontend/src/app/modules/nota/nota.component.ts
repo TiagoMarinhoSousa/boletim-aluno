@@ -8,7 +8,7 @@ import { Avaliacao } from '../../models/avaliacao.model';
 import {
   DisciplinaService,
   Disciplina,
-} from '../../services/disciplina.service';
+} from '../../services/disciplina.service'; // Remover importação de ErrorResponse
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -148,11 +148,11 @@ export class NotaComponent implements OnInit {
 
     // Validação: nota deve estar entre 0 e 10
     if (valor < 0 || valor > 10) {
-      this.snackBar.open('✗ Nota deve estar entre 0 e 10', 'Fechar', {
+      this.snackBar.open('✗ O valor da nota deve estar entre 0 e 10.', 'Fechar', {
         duration: 3000,
         horizontalPosition: 'right',
         verticalPosition: 'bottom',
-        panelClass: ['snackbar-erro'],
+        panelClass: ['snackbar-erro']
       });
       // Marca como inválido
       this.inputsInvalidos.add(chave);
@@ -246,17 +246,8 @@ export class NotaComponent implements OnInit {
       error: (erro) => {
         // Desativa loading
         this.carregando = false;
-        
-        const mensagem = erro.error?.message || erro.message || 'Erro ao salvar notas';
-        
-        // Mostra snackbar com erro
-        this.snackBar.open('✗ ' + mensagem, 'Fechar', {
-          duration: 7000,
-          horizontalPosition: 'right',
-          verticalPosition: 'bottom',
-          panelClass: ['snackbar-erro']
-        });
-        
+        // O ErrorInterceptor agora é responsável por mostrar o snackbar de erro.
+        // Apenas logamos o erro no console para fins de debug.
         console.error('Erro ao salvar notas:', erro);
       }
     });
