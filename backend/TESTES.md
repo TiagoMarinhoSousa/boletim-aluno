@@ -2,7 +2,7 @@
 
 ## Sumário de Testes
 
-Os testes unitários cobrem as regras de negócio principais da aplicação. Total de **63 testes** divididos em 4 suítes de testes.
+Os testes unitários cobrem as regras de negócio principais da aplicação. Total de **54 testes** divididos em 3 suítes de testes.
 
 ### Execução dos Testes
 
@@ -75,7 +75,7 @@ Testes unitários básicos para o `NotaService` usando Mockito.
 
 ---
 
-## 2. AlunoServiceTest (15 testes)
+## 2. AlunoServiceTest (17 testes)
 
 Testes para validações e regras de negócio do `AlunoService`.
 
@@ -113,7 +113,7 @@ Testes para validações e regras de negócio do `AlunoService`.
 
 ---
 
-## 3. NotaServiceTest (21 testes)
+## 3. NotaServiceTest (25 testes)
 
 Testes mais abrangentes para `NotaService` com múltiplos cenários.
 
@@ -147,12 +147,6 @@ Testes mais abrangentes para `NotaService` com múltiplos cenários.
 - ✅ Rejeitar lote com nota inválida (2 testes)
 - ✅ Listar notas por aluno
 - ✅ Retornar lista vazia quando aluno sem notas
-
----
-
-## 4. AlunoServiceTest Extra (15 testes)
-
-Duplicado do teste #2 mas em pacote diferente para cobertura total.
 
 ---
 
@@ -192,9 +186,9 @@ Duplicado do teste #2 mas em pacote diferente para cobertura total.
 
 | Métrica | Valor |
 |---------|-------|
-| Total de Testes | 63 |
-| Testes Passando | 63 (100%) |
-| Suítes de Testes | 4 |
+| Total de Testes | 54 |
+| Testes Passando | 54 (100%) |
+| Suítes de Testes | 3 |
 | Taxa de Cobertura (Lógica) | ~85% |
 | Tempo de Execução | ~10s |
 

@@ -2,11 +2,11 @@
 
 ## ✅ Testes Criados com Sucesso
 
-### **63 Testes Implementados | 100% Passando**
+### **54 Testes Implementados | 100% Passando**
 
 ```
 ████████████████████████████████████████ 100%
-✓ 63 testes executados com sucesso
+✓ 54 testes executados com sucesso
 ✓ 0 falhas
 ✓ 0 erros
 ```
@@ -17,11 +17,10 @@
 
 ```
 NotaServiceUnitTest         [████████████] 12 testes
-AlunoServiceTest            [███████████████] 15 testes  
-NotaServiceTest             [███████████████████] 21 testes
-AlunoServiceTest (extra)    [███████████████] 15 testes
+AlunoServiceTest            [█████████████████] 17 testes  
+NotaServiceTest             [█████████████████████████] 25 testes
 ────────────────────────────────────────────────
-TOTAL                       [██████████████████████████████] 63 testes
+TOTAL                       [██████████████████████████████] 54 testes
 ```
 
 ---
@@ -106,11 +105,9 @@ Casos testados:
 ```
 backend/src/test/java/br/com/boletim/backend/
 ├── NotaServiceUnitTest.java              (12 testes - básicos)
-├── service/
-│   ├── AlunoServiceTest.java             (15 testes - alunos)
-│   └── NotaServiceTest.java              (21 testes - completo)
-└── com/boletim/backend/service/
-    └── AlunoServiceTest.java             (15 testes - cobertura)
+└── service/
+    ├── AlunoServiceTest.java             (17 testes - alunos)
+    └── NotaServiceTest.java              (25 testes - completo)
 ```
 
 ---
@@ -214,9 +211,8 @@ notaService.salvarEmLote(notasDTO);
 ```
 Requisito: Testes unitários simples para regras de negócio
 Status: ✅ COMPLETO
-Testes: 63 passando (100%)
+Testes: 54 passando (100%)
 Cobertura: ~90% da lógica crítica
 Documentação: TESTES.md
-Commit: test: adicionar testes unitarios para regras de negocio (63 testes)
 ```
 

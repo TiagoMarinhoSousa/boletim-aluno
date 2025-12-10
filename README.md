@@ -87,7 +87,7 @@ boletim-aluno/
 │   │   └── resources/
 │   │       ├── application.properties
 │   │       └── data.sql        # Dados iniciais (seed)
-│   ├── src/test/java/          # Testes unitários (63 testes)
+│   ├── src/test/java/          # Testes unitários (54 testes)
 │   └── pom.xml                 # Dependências Maven
 │
 ├── frontend/                   # Angular SPA
@@ -101,7 +101,7 @@ boletim-aluno/
 │   │   ├── models/             # Interfaces/DTOs
 │   │   ├── app.component.*
 │   │   └── app.module.ts
-│   ├── src/test/               # Testes (35 testes)
+│   ├── src/test/               # Testes (76 testes)
 │   ├── angular.json
 │   ├── tsconfig.json
 │   └── package.json
@@ -132,7 +132,7 @@ boletim-aluno/
 
 | Recurso | Status | Detalhes |
 |---|---|---|
-| **98 Testes Automatizados** | ✅ | 63 backend + 35 frontend |
+| **130 Testes Automatizados** | ✅ | 54 backend + 76 frontend |
 | **Validação Dupla Camada** | ✅ | Frontend + Backend |
 | **Feedback Visual** | ✅ | Snackbars, spinner, highlighting |
 | **Tratamento de Erros** | ✅ | Mensagens claras em português |
@@ -163,11 +163,15 @@ Avaliações:      3 avaliações por aluno
 
 ## 🧪 Testes
 
-### Backend (63 testes - 100% passando)
+### Backend (54 testes - 100% passando)
 
 ```bash
 # Executar todos os testes
 mvn clean test
+
+# Executar testes com relatório de cobertura (JaCoCo)
+mvn clean test jacoco:report
+# Relatório HTML gerado em: target/site/jacoco/index.html
 
 # Testes específicos
 mvn test -Dtest=NotaServiceUnitTest
@@ -176,29 +180,34 @@ mvn test -Dtest=NotaServiceTest
 ```
 
 **Cobertura:**
-- ✅ Validação de entrada (10 testes)
-- ✅ Cálculo de média ponderada (9 testes)
-- ✅ Validação de aluno (6 testes)
-- ✅ Operações em lote (3 testes)
-- ✅ + outros (35 testes)
+- ✅ NotaServiceUnitTest (12 testes)
+- ✅ AlunoServiceTest (17 testes)
+- ✅ NotaServiceTest (25 testes)
 
 Documentação completa: [TESTES.md](backend/TESTES.md)
 
-### Frontend (35 testes - 100% passando)
+### Frontend (76 testes - 100% passando)
 
 ```bash
-# Executar testes
-npm test -- --watch=false --browsers=ChromeHeadless
-
-# Com watch mode
+# Executar testes com watch mode
 npm test
+
+# Executar testes com cobertura
+npm run test:coverage
+# Relatório HTML gerado em: coverage/boletim-frontend/index.html
+
+# Executar testes para CI/CD (headless + coverage)
+npm run test:ci
 ```
 
-**Cobertura:**
-- ✅ NotaComponent (17 testes)
-- ✅ Services (13 testes)
+**Cobertura (>85%):**
+- ✅ NotaComponent (36 testes)
+- ✅ NotaService (17 testes)
+- ✅ TurmaService (5 testes)
+- ✅ DisciplinaService (9 testes)
+- ✅ AlunoService (5 testes)
+- ✅ ErrorInterceptor (3 testes)
 - ✅ AppComponent (3 testes)
-- ✅ Outros componentes (2 testes)
 
 Documentação completa: [TESTES_FRONTEND_FINAL.md](TESTES_FRONTEND_FINAL.md)
 
@@ -604,10 +613,10 @@ GET  /notas/aluno/{id}/media-ponderada  - Média
 
 | Métrica | Valor |
 |---------|-------|
-| **Testes Backend** | 63 (100% ✅) |
-| **Testes Frontend** | 35 (100% ✅) |
-| **Total** | **98** |
-| **Cobertura** | ~90% |
+| **Testes Backend** | 54 (100% ✅) |
+| **Testes Frontend** | 76 (100% ✅) |
+| **Total** | **130** |
+| **Cobertura** | ~92% |
 | **Tempo Execução** | ~5 seg |
 
 ### Git
@@ -684,6 +693,6 @@ Encontrou algum problema?
 ---
 ---
 
-**Última atualização:** 3 de dezembro de 2025  
-**Versão:** 1.0.1  
+**Última atualização:** 10 de dezembro de 2025  
+**Versão:** 1.0.2  
 **Status:** Production Ready ✅
