@@ -245,46 +245,66 @@ app/
 #### Frontend
 ```typescript
 // 1. Type="number" - força entrada numérica
-<input type="number" min="0" max="10" (change)="atualizarNota($event)">
+<input type="number" min="0" max="10" (change)="atualizarNota(...)">
 
-// 2. Validação em TypeScript
-atualizarNota(alunoId, avaliacaoId, valor) {
+// 2. Validação em TypeScript com feedback visual (snackBar)
+atualizarNota(alunoId: number, avaliacaoId: number, valor: number): void {
     if (valor < 0 || valor > 10) {
-        alert('Nota deve estar entre 0 e 10');
+        this.snackBar.open('✗ O valor da nota deve estar entre 0 e 10.', 'Fechar', {
+            duration: 3000,
+            panelClass: ['snackbar-erro']
+        });
+        this.inputsInvalidos.add(`${alunoId}-${avaliacaoId}`);
         return;
     }
-    ...
+    // Se entrada válida, remove da marcação de inválido e marca como alterado
+    this.inputsInvalidos.delete(`${alunoId}-${avaliacaoId}`);
+    this.notasAlteradas.add(`${alunoId}-${avaliacaoId}`);
+    // ... atualiza ou cria nota
 }
 
-// 3. Pré-validação antes de enviar
+// 3. Pré-validação antes de enviar com feedback visual
 salvarNotas() {
     if (this.inputsInvalidos.size > 0) {
-        alert('Existem campos com validação pendente');
+        this.snackBar.open('✗ Existem campos com validação pendente.', 'Fechar', {
+            duration: 5000,
+            panelClass: ['snackbar-erro']
+        });
         return;
     }
-    ...
+    // ... envia notas
 }
 ```
 
 #### Backend
 ```java
-// 1. Pré-validação em lote
-notasDTO.forEach(nota -> {
-    if (nota.getValor() < 0 || nota.getValor() > 10) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Nota deve estar entre 0 e 10"
-        );
-    }
-});
-
-// 2. Validação individual
-if (nota.getValor() < 0 || nota.getValor() > 10) {
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ...);
+// 1. Validação de nulidade
+if (alunoId == null || avaliacaoId == null || valorNota == null) {
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+        "IDs de aluno, avaliação e o valor da nota não podem ser nulos.");
 }
 
-// 3. Persistência com integridade
+// 2. Validação de limites (0-10)
+if (valorNota < 0 || valorNota > 10) {
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+        "Nota deve estar entre 0 e 10");
+}
+
+// 3. Upsert: verifica se existe nota e atualiza ou cria nova
+Optional<Nota> existente = notaRepository.findByAlunoIdAndAvaliacaoId(alunoId, avaliacaoId);
+if (existente.isPresent()) {
+    nota = existente.get();
+    nota.setValor(valorNota); // sobrescreve
+} else {
+    nota = new Nota(); // cria nova
+    nota.setAluno(aluno);
+    nota.setAvaliacao(avaliacao);
+    nota.setValor(valorNota);
+}
 notaRepository.save(nota);
+
+// 4. Constraint única no banco (definida na entidade JPA)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "aluno_id", "avaliacao_id" }))
 ```
 
 ### Regras Aplicadas
