@@ -39,7 +39,8 @@ public class NotaService {
 
         // Validação explícita de nulidade para garantir type safety
         if (alunoId == null || avaliacaoId == null || valorNota == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "IDs de aluno, avaliação e o valor da nota não podem ser nulos.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "IDs de aluno, avaliação e o valor da nota não podem ser nulos.");
         }
 
         // Validação: nota deve estar entre 0 e 10
@@ -128,6 +129,15 @@ public class NotaService {
 
     @Transactional
     public List<Nota> salvarEmLote(List<NotaDTO> notasDTO) {
+        // Pré-validação: verifica se todas as notas estão no intervalo válido antes de
+        // processar
+        for (NotaDTO notaDTO : notasDTO) {
+            Double valorNota = notaDTO.getValor();
+            if (valorNota == null || valorNota < 0 || valorNota > 10) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nota deve estar entre 0 e 10");
+            }
+        }
+
         return notasDTO.stream()
                 .map(this::salvar) // Reutiliza o método salvar, que agora contém toda a validação.
                 .toList();

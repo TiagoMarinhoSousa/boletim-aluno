@@ -1,4 +1,10 @@
 -- =========================
+-- CONSTRAINT ÚNICA: aluno + avaliação
+-- Garante que cada aluno tenha no máximo uma nota por avaliação
+-- =========================
+ALTER TABLE nota ADD CONSTRAINT IF NOT EXISTS uk_aluno_avaliacao UNIQUE (aluno_id, avaliacao_id);
+
+-- =========================
 -- TURMAS
 -- =========================
 INSERT INTO turma (nome) VALUES ('Turma A');

@@ -30,32 +30,33 @@ public class AlunoService {
         return alunoRepository.findAll();
     }
 
- public Aluno salvar(AlunoDTO alunoDTO) {
-    String nomeAluno = alunoDTO.getNome();
-    Long turmaId = alunoDTO.getTurmaId();
+    public Aluno salvar(AlunoDTO alunoDTO) {
+        String nomeAluno = alunoDTO.getNome();
+        Long turmaId = alunoDTO.getTurmaId();
 
-    // Validação explícita para satisfazer a análise estática e garantir robustez.
-    if (nomeAluno == null || nomeAluno.isBlank() || turmaId == null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do aluno e ID da turma são obrigatórios.");
+        // Validação explícita para satisfazer a análise estática e garantir robustez.
+        if (nomeAluno == null || nomeAluno.isBlank() || turmaId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do aluno e ID da turma são obrigatórios.");
+        }
+
+        Turma turma = turmaRepository.findById(turmaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Turma não encontrada com o ID: " + turmaId));
+
+        Aluno aluno = new Aluno();
+        aluno.setNome(nomeAluno);
+        aluno.setTurma(turma);
+
+        return alunoRepository.save(aluno);
     }
-
-    Turma turma = turmaRepository.findById(turmaId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada"));
-
-    Aluno aluno = new Aluno();
-    aluno.setNome(nomeAluno);
-    aluno.setTurma(turma);
-
-    return alunoRepository.save(aluno);
-}
-
 
     public Aluno buscarPorId(Long id) {
         if (id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID do aluno não pode ser nulo.");
         }
         return alunoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado com o ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Aluno não encontrado com o ID: " + id));
     }
 
     public void deletar(Long id) {
