@@ -35,8 +35,8 @@ describe('AlunoService', () => {
 
     it('deve retornar lista de alunos', () => {
       const alunos = [
-        { id: 1, nome: 'João Silva' },
-        { id: 2, nome: 'Maria Santos' }
+        { id: 1, nome: 'João Silva', turma: { id: 1, nome: 'Turma A' } },
+        { id: 2, nome: 'Maria Santos', turma: { id: 1, nome: 'Turma A' } }
       ];
 
       service.listarTodos().subscribe((result) => {
@@ -63,8 +63,8 @@ describe('AlunoService', () => {
     it('deve retornar notas do aluno', () => {
       const alunoId = 1;
       const notas = [
-        { avaliacaoId: 1, valor: 8 },
-        { avaliacaoId: 2, valor: 7 }
+        { alunoId: 1, avaliacaoId: 1, valor: 8 },
+        { alunoId: 1, avaliacaoId: 2, valor: 7 }
       ];
 
       service.listarNotasPorAluno(alunoId).subscribe((result) => {

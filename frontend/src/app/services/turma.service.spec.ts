@@ -63,8 +63,8 @@ describe('TurmaService', () => {
     it('deve retornar lista de alunos da turma', () => {
       const turmaId = 1;
       const alunos = [
-        { id: 1, nome: 'João Silva' },
-        { id: 2, nome: 'Maria Santos' }
+        { id: 1, nome: 'João Silva', turma: { id: 1, nome: 'Turma A' } },
+        { id: 2, nome: 'Maria Santos', turma: { id: 1, nome: 'Turma A' } }
       ];
 
       service.listarAlunosPorTurma(turmaId).subscribe((result) => {

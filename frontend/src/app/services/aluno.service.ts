@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Aluno } from '../models/aluno.model';
+import { NotaDTO } from './nota.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +12,11 @@ export class AlunoService {
 
   constructor(private http: HttpClient) {}
 
-  listarTodos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}`);
+  listarTodos(): Observable<Aluno[]> {
+    return this.http.get<Aluno[]>(`${this.apiUrl}`);
   }
 
-  listarNotasPorAluno(alunoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${alunoId}/notas`);
+  listarNotasPorAluno(alunoId: number): Observable<NotaDTO[]> {
+    return this.http.get<NotaDTO[]>(`${this.apiUrl}/${alunoId}/notas`);
   }
 }
