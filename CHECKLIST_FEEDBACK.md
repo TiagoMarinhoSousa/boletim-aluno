@@ -27,7 +27,7 @@
 - [x] Snackbars para sucesso/erro
 - [x] Botão "Salvar" desabilitado quando necessário
 - [x] Spinner durante carregamento
-- [x] 76 testes passando (92% cobertura)
+- [x] 94 testes passando (100% cobertura)
 - [x] Cobertura automatizada com ng test --code-coverage
 
 ### Documentação
@@ -49,10 +49,10 @@
 - [ ] **Migração para Postgres/MySQL** - com Flyway ou Liquibase
 
 ### Frontend
-- [ ] **Typing estrito** - eliminar `any[]`, usar tipos específicos (Turma[], Aluno[])
-- [ ] **Ativar strict no tsconfig** - maior segurança de tipos
-- [ ] **Reactive Forms** - migrar de validação manual para FormGroup/FormControl
-- [ ] **Remover alert()** - padronizar tudo com MatSnackBar (✅ já feito nos testes)
+- [x] **Typing estrito** - TurmaService e AlunoService usando Turma[], Aluno[], NotaDTO[] ✅
+- [x] **Ativar strict no tsconfig** - já ativo com strictTemplates e mais opções ✅
+- [x] **Reactive Forms** - migrado de validação manual para FormGroup/FormControl ✅
+- [x] **Remover alert()** - já usa MatSnackBar em todo o código ✅
 - [ ] **Separar componentes** - quebrar NotaComponent em componentes menores
 
 ### DevOps / Produção

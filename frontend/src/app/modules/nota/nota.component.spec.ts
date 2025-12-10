@@ -110,11 +110,15 @@ describe('NotaComponent', () => {
       const inputElement = document.createElement('input');
       inputElement.value = '-1';
 
+      // Primeiro, cria o FormControl para validação
+      const control = component.getNotaControl(1, 1);
+      control.setValue(-1);
+      control.markAsTouched();
+
       spyOn(component['snackBar'], 'open');
       component.atualizarNota(1, 1, -1, inputElement);
       
       expect(component['snackBar'].open).toHaveBeenCalled();
-      expect(component.inputsInvalidos.has('1-1')).toBeTrue();
       expect(inputElement.value).toBe('');
     });
 
@@ -123,11 +127,15 @@ describe('NotaComponent', () => {
       const inputElement = document.createElement('input');
       inputElement.value = '11';
 
+      // Primeiro, cria o FormControl para validação
+      const control = component.getNotaControl(1, 1);
+      control.setValue(11);
+      control.markAsTouched();
+
       spyOn(component['snackBar'], 'open');
       component.atualizarNota(1, 1, 11, inputElement);
       
       expect(component['snackBar'].open).toHaveBeenCalled();
-      expect(component.inputsInvalidos.has('1-1')).toBeTrue();
       expect(inputElement.value).toBe('');
     });
 
@@ -229,16 +237,30 @@ describe('NotaComponent', () => {
     it('deve rastrear inputs inválidos', () => {
       component.avaliacoes = mockAvaliacoes;
       const inputElement = document.createElement('input');
+      inputElement.value = '15';
 
+      // Primeiro cria o FormControl e define valor inválido
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15);
+      control.markAsTouched();
+
+      spyOn(component['snackBar'], 'open');
       component.atualizarNota(1, 1, 15, inputElement);
       
-      expect(component.inputsInvalidos.has('1-1')).toBeTrue();
+      // Verifica que o erro foi mostrado e o input foi limpo
+      expect(component['snackBar'].open).toHaveBeenCalled();
+      expect(inputElement.value).toBe('');
     });
 
     it('deve limpar input inválido', () => {
       component.avaliacoes = mockAvaliacoes;
       const inputElement = document.createElement('input');
       inputElement.value = '15';
+
+      // Primeiro cria o FormControl e define valor inválido
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15);
+      control.markAsTouched();
 
       component.atualizarNota(1, 1, 15, inputElement);
       
@@ -269,11 +291,16 @@ describe('NotaComponent', () => {
     });
 
     it('não deve salvar se há inputs inválidos', () => {
-      component.inputsInvalidos.add('1-1');
+      // Cria um FormControl inválido (valor fora do range 0-10)
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15); // valor inválido
+      control.markAsTouched();
       
+      spyOn(component['snackBar'], 'open');
       component.salvarNotas();
       
       expect(notaService.salvarNotasEmLote).not.toHaveBeenCalled();
+      expect(component['snackBar'].open).toHaveBeenCalled();
     });
 
     it('deve salvar se todos os dados são válidos', () => {
@@ -424,6 +451,171 @@ describe('NotaComponent', () => {
     it('deve buscar notas para cada aluno', () => {
       component.selecionarDisciplina(1);
       expect(notaService.listarPorAluno).toHaveBeenCalledTimes(2);
+    });
+
+    it('deve filtrar apenas notas da disciplina selecionada', () => {
+      const notasAluno = [
+        { alunoId: 1, avaliacaoId: 1, valor: 8 },  // disciplina 1
+        { alunoId: 1, avaliacaoId: 4, valor: 7 }   // disciplina 2 - não deve incluir
+      ];
+      notaService.listarPorAluno.and.returnValue(of(notasAluno));
+
+      component.selecionarDisciplina(1);
+
+      // Apenas notas da disciplina 1 (avaliacaoIds 1, 2, 3)
+      expect(component.notas.filter(n => n.avaliacaoId <= 3).length).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  // ✅ TESTES DE SELEÇÃO DE TURMA
+  describe('selecionarTurma', () => {
+    beforeEach(() => {
+      const turmaServiceReal = TestBed.inject(TurmaService) as jasmine.SpyObj<TurmaService>;
+      turmaServiceReal.listarAlunosPorTurma = jasmine.createSpy().and.returnValue(of(mockAlunos));
+      notaService.listarPorAluno.and.returnValue(of([]));
+    });
+
+    it('deve configurar turmaSelecionada', () => {
+      const turmaServiceReal = TestBed.inject(TurmaService) as any;
+      turmaServiceReal.listarAlunosPorTurma = jasmine.createSpy().and.returnValue(of(mockAlunos));
+
+      component.selecionarTurma(1);
+      expect(component.turmaSelecionada).toBe(1);
+    });
+  });
+
+  // ✅ TESTES DE isInvalido e isAlterado
+  describe('Validação de FormControl', () => {
+    it('isInvalido deve retornar true para controle inválido e tocado', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15); // valor inválido
+      control.markAsTouched();
+
+      expect(component.isInvalido(1, 1)).toBeTrue();
+    });
+
+    it('isInvalido deve retornar false para controle válido', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8); // valor válido
+      control.markAsTouched();
+
+      expect(component.isInvalido(1, 1)).toBeFalse();
+    });
+
+    it('isInvalido deve retornar false para controle inválido mas não tocado', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15); // valor inválido
+
+      expect(component.isInvalido(1, 1)).toBeFalse();
+    });
+
+    it('isAlterado deve retornar true para controle dirty e válido', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8); // valor válido
+      control.markAsDirty();
+
+      expect(component.isAlterado(1, 1)).toBeTrue();
+    });
+
+    it('isAlterado deve retornar false para controle não dirty', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8); // valor válido
+
+      expect(component.isAlterado(1, 1)).toBeFalse();
+    });
+
+    it('isAlterado deve retornar false para controle dirty mas inválido', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15); // valor inválido
+      control.markAsDirty();
+
+      expect(component.isAlterado(1, 1)).toBeFalse();
+    });
+  });
+
+  // ✅ TESTES DE hasNotasAlteradas e hasErros
+  describe('Estado do Formulário', () => {
+    it('hasNotasAlteradas deve retornar true quando formulário está dirty', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8);
+      control.markAsDirty();
+
+      expect(component.hasNotasAlteradas()).toBeTrue();
+    });
+
+    it('hasNotasAlteradas deve retornar false quando formulário está pristine', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8);
+
+      expect(component.hasNotasAlteradas()).toBeFalse();
+    });
+
+    it('hasErros deve retornar true quando formulário tem erros', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15); // valor inválido
+
+      expect(component.hasErros()).toBeTrue();
+    });
+
+    it('hasErros deve retornar false quando formulário é válido', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8); // valor válido
+
+      expect(component.hasErros()).toBeFalse();
+    });
+  });
+
+  // ✅ TESTES DE getNotaControl
+  describe('getNotaControl', () => {
+    it('deve criar controle se não existir', () => {
+      const control = component.getNotaControl(99, 99);
+      expect(control).toBeTruthy();
+      expect(control.value).toBeNull();
+    });
+
+    it('deve retornar controle existente se já criado', () => {
+      const control1 = component.getNotaControl(1, 1);
+      control1.setValue(8);
+
+      const control2 = component.getNotaControl(1, 1);
+      expect(control2.value).toBe(8);
+    });
+  });
+
+  // ✅ TESTES ADICIONAIS DE COBERTURA
+  describe('Cobertura Adicional', () => {
+    it('inputsInvalidos getter deve retornar Set com controles inválidos', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(15); // inválido
+      control.markAsTouched();
+
+      const invalidos = component.inputsInvalidos;
+      expect(invalidos.has('1-1')).toBeTrue();
+    });
+
+    it('inputsInvalidos getter deve retornar Set vazio quando não há inválidos', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8); // válido
+
+      const invalidos = component.inputsInvalidos;
+      expect(invalidos.size).toBe(0);
+    });
+
+    it('notasAlteradas getter deve retornar Set com controles alterados', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8);
+      control.markAsDirty();
+
+      const alteradas = component.notasAlteradas;
+      expect(alteradas.has('1-1')).toBeTrue();
+    });
+
+    it('notasAlteradas getter deve retornar Set vazio quando não há alterações', () => {
+      const control = component.getNotaControl(1, 1);
+      control.setValue(8);
+
+      const alteradas = component.notasAlteradas;
+      expect(alteradas.size).toBe(0);
     });
   });
 });

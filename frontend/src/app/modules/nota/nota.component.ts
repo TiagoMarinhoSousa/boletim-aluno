@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { TurmaService } from '../../services/turma.service';
 import { AlunoService } from '../../services/aluno.service';
-import { Turma } from '../../models/turma.model'; // Importar Turma
-import { Aluno } from '../../models/aluno.model'; // Importar Aluno
+import { Turma } from '../../models/turma.model';
+import { Aluno } from '../../models/aluno.model';
 import { NotaService, NotaDTO } from '../../services/nota.service';
 import { Avaliacao } from '../../models/avaliacao.model';
-import {
-  DisciplinaService,
-  Disciplina,
-} from '../../services/disciplina.service'; // Remover importação de ErrorResponse
+import { DisciplinaService, Disciplina } from '../../services/disciplina.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -25,19 +23,17 @@ export class NotaComponent implements OnInit {
 
   turmaSelecionada: number | null = null;
   disciplinaSelecionada: number | null = null;
-  
-  // Rastreia inputs com valores inválidos que foram resetados
-  inputsInvalidos: Set<string> = new Set();
-  
-  // Rastreia notas que foram alteradas
-  notasAlteradas: Set<string> = new Set();
-  
+
+  // Formulário reativo para as notas
+  notasForm: FormGroup = new FormGroup({});
+
   // Flag para mostrar loading
   carregando: boolean = false;
 
   colunasTabela: string[] = ['aluno', 'media'];
 
   constructor(
+    private fb: FormBuilder,
     private turmaService: TurmaService,
     private alunoService: AlunoService,
     private disciplinaService: DisciplinaService,
@@ -57,14 +53,69 @@ export class NotaComponent implements OnInit {
     });
   }
 
+  // Retorna a chave única para o FormControl de uma nota
+  private getNotaKey(alunoId: number, avaliacaoId: number): string {
+    return `${alunoId}-${avaliacaoId}`;
+  }
+
+  // Obtém o FormControl para uma nota específica
+  getNotaControl(alunoId: number, avaliacaoId: number): FormControl {
+    const key = this.getNotaKey(alunoId, avaliacaoId);
+    if (!this.notasForm.contains(key)) {
+      // Cria o controle se não existir (com validadores min/max)
+      this.notasForm.addControl(
+        key,
+        new FormControl(null, [Validators.min(0), Validators.max(10)])
+      );
+    }
+    return this.notasForm.get(key) as FormControl;
+  }
+
+  // Verifica se um controle está inválido
+  isInvalido(alunoId: number, avaliacaoId: number): boolean {
+    const control = this.getNotaControl(alunoId, avaliacaoId);
+    return control.invalid && control.touched;
+  }
+
+  // Verifica se um controle foi alterado
+  isAlterado(alunoId: number, avaliacaoId: number): boolean {
+    const control = this.getNotaControl(alunoId, avaliacaoId);
+    return control.dirty && control.valid;
+  }
+
+  // Recria o formulário quando muda a seleção
+  private criarFormularioNotas(): void {
+    this.notasForm = new FormGroup({});
+    
+    this.alunos.forEach((aluno) => {
+      this.avaliacoes.forEach((avaliacao) => {
+        const key = this.getNotaKey(aluno.id, avaliacao.id);
+        const valorExistente = this.getNotaValorNumerico(aluno.id, avaliacao.id);
+        
+        this.notasForm.addControl(
+          key,
+          new FormControl(valorExistente, [Validators.min(0), Validators.max(10)])
+        );
+      });
+    });
+  }
+
+  // Retorna valor numérico da nota ou null
+  private getNotaValorNumerico(alunoId: number, avaliacaoId: number): number | null {
+    const nota = this.notas.find(
+      (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
+    );
+    return nota ? nota.valor : null;
+  }
+
   getValorDoEvento(event: Event): number {
     const input = event.target as HTMLInputElement;
-    // Retorna NaN se input vazio ou se tiver "-"
     if (input.value === '' || input.value === '-') {
       return NaN;
     }
     return input.valueAsNumber;
   }
+
   selecionarTurma(turmaId: number): void {
     this.turmaSelecionada = turmaId;
 
@@ -83,9 +134,8 @@ export class NotaComponent implements OnInit {
   selecionarDisciplina(disciplinaId: number) {
     this.disciplinaSelecionada = disciplinaId;
 
-    // Avaliações da disciplina selecionada (IDs: 1-3 para disciplina 1, 4-6 para disciplina 2, etc)
     const avaliacaoIds = this.getAvaliacaoIdsPorDisciplina(disciplinaId);
-    
+
     this.avaliacoes = [
       { id: avaliacaoIds[0], descricao: 'Prova', peso: 5, disciplinaId },
       { id: avaliacaoIds[1], descricao: 'Trabalho', peso: 2, disciplinaId },
@@ -98,24 +148,28 @@ export class NotaComponent implements OnInit {
       'media',
     ];
 
-    // Buscar notas de cada aluno no backend
+    // Buscar notas e depois criar o formulário
     this.notas = [];
+    let alunosProcessados = 0;
+    
     this.alunos.forEach((aluno) => {
-      this.notaService
-        .listarPorAluno(aluno.id)
-        .subscribe((notasAluno) => {
-          // Filtrar apenas as notas da disciplina selecionada
-          notasAluno.forEach((n) => {
-            if (avaliacaoIds.includes(n.avaliacaoId)) {
-              this.notas.push(n);
-            }
-          });
+      this.notaService.listarPorAluno(aluno.id).subscribe((notasAluno) => {
+        notasAluno.forEach((n) => {
+          if (avaliacaoIds.includes(n.avaliacaoId)) {
+            this.notas.push(n);
+          }
         });
+        
+        alunosProcessados++;
+        // Quando todos os alunos forem processados, cria o formulário
+        if (alunosProcessados === this.alunos.length) {
+          this.criarFormularioNotas();
+        }
+      });
     });
   }
 
   getAvaliacaoIdsPorDisciplina(disciplinaId: number): number[] {
-    // Mapeamento: disciplina 1 -> avaliações 1-3, disciplina 2 -> avaliações 4-6, etc
     const inicio = (disciplinaId - 1) * 3 + 1;
     return [inicio, inicio + 1, inicio + 2];
   }
@@ -127,66 +181,51 @@ export class NotaComponent implements OnInit {
     return nota ? nota.valor.toString() : '-';
   }
 
+  // Atualiza nota usando Reactive Forms
   atualizarNota(alunoId: number, avaliacaoId: number, valor: number, inputElement?: HTMLInputElement): void {
-    const chave = `${alunoId}-${avaliacaoId}`;
-    
-    // Se o input está vazio (NaN), permite remover a nota
+    const control = this.getNotaControl(alunoId, avaliacaoId);
+    control.markAsTouched();
+    control.markAsDirty();
+
+    // Se o input está vazio (NaN), limpa a nota
     if (isNaN(valor)) {
+      control.setValue(null);
       // Remove nota do array se existir
       const index = this.notas.findIndex(
         (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
       );
       if (index !== -1) {
         this.notas.splice(index, 1);
-        this.notasAlteradas.add(chave);
         this.notas = [...this.notas];
       }
-      // Remove da marcação de inválido
-      this.inputsInvalidos.delete(chave);
       return;
     }
 
-    // Validação: nota deve estar entre 0 e 10
-    if (valor < 0 || valor > 10) {
+    // Validação via Reactive Forms
+    if (control.invalid) {
       this.snackBar.open('✗ O valor da nota deve estar entre 0 e 10.', 'Fechar', {
         duration: 3000,
         horizontalPosition: 'right',
         verticalPosition: 'bottom',
         panelClass: ['snackbar-erro']
       });
-      // Marca como inválido
-      this.inputsInvalidos.add(chave);
-      // Remove nota inválida do array
-      const index = this.notas.findIndex(
-        (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
-      );
-      if (index !== -1) {
-        this.notas.splice(index, 1);
-      }
-      // Limpa o input diretamente
+      
+      // Limpa o input
       if (inputElement) {
         inputElement.value = '';
       }
-      // Força detecção de mudança
-      this.notas = [...this.notas];
+      control.setValue(null);
       return;
     }
 
-    // Se entrada for válida, remove da marcação de inválido
-    this.inputsInvalidos.delete(chave);
-    // Marca como alterado
-    this.notasAlteradas.add(chave);
-
-    // Buscar nota existente
+    // Atualiza ou cria nota no array
     const notaExistente = this.notas.find(
       (n) => n.alunoId === alunoId && n.avaliacaoId === avaliacaoId
     );
 
     if (notaExistente) {
-      // Se existe, sobrescrever o valor
       notaExistente.valor = valor;
     } else {
-      // Se não existe, criar nova nota
       this.notas.push({ alunoId, avaliacaoId, valor });
     }
   }
@@ -210,9 +249,19 @@ export class NotaComponent implements OnInit {
     return '-';
   }
 
+  // Verifica se há notas alteradas (dirty)
+  hasNotasAlteradas(): boolean {
+    return this.notasForm.dirty;
+  }
+
+  // Verifica se o formulário tem erros
+  hasErros(): boolean {
+    return this.notasForm.invalid;
+  }
+
   salvarNotas() {
-    // Verifica se há inputs inválidos pendentes
-    if (this.inputsInvalidos.size > 0) {
+    // Verifica se há erros de validação no formulário
+    if (this.notasForm.invalid) {
       this.snackBar.open('✗ Existem campos com validação pendente. Corrija antes de salvar.', 'Fechar', {
         duration: 5000,
         horizontalPosition: 'right',
@@ -227,29 +276,52 @@ export class NotaComponent implements OnInit {
 
     this.notaService.salvarNotasEmLote(this.notas).subscribe({
       next: () => {
-        // Desativa loading
         this.carregando = false;
         
-        // Limpa rastreamento de alterações após salvar
-        this.notasAlteradas.clear();
-        
-        // Mostra snackbar com sucesso
+        // Marca o formulário como pristine (não alterado)
+        this.notasForm.markAsPristine();
+
         this.snackBar.open('✓ Notas salvas com sucesso!', 'Fechar', {
           duration: 5000,
           horizontalPosition: 'right',
           verticalPosition: 'bottom',
           panelClass: ['snackbar-sucesso']
         });
-        
+
         console.log('Notas salvas com sucesso!');
       },
       error: (erro) => {
-        // Desativa loading
         this.carregando = false;
-        // O ErrorInterceptor agora é responsável por mostrar o snackbar de erro.
-        // Apenas logamos o erro no console para fins de debug.
         console.error('Erro ao salvar notas:', erro);
       }
     });
+  }
+
+  // ============================================
+  // MÉTODOS DE COMPATIBILIDADE (para testes existentes)
+  // ============================================
+  
+  // Compatibilidade: retorna Set de inputs inválidos
+  get inputsInvalidos(): Set<string> {
+    const invalidos = new Set<string>();
+    Object.keys(this.notasForm.controls).forEach(key => {
+      const control = this.notasForm.get(key);
+      if (control && control.invalid && control.touched) {
+        invalidos.add(key);
+      }
+    });
+    return invalidos;
+  }
+
+  // Compatibilidade: retorna Set de notas alteradas
+  get notasAlteradas(): Set<string> {
+    const alteradas = new Set<string>();
+    Object.keys(this.notasForm.controls).forEach(key => {
+      const control = this.notasForm.get(key);
+      if (control && control.dirty) {
+        alteradas.add(key);
+      }
+    });
+    return alteradas;
   }
 }

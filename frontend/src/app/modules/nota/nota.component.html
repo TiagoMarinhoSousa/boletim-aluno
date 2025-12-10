@@ -45,10 +45,10 @@
         type="number"
         class="form-control"
         [ngClass]="{ 
-          'input-erro': inputsInvalidos.has(aluno.id + '-' + avaliacao.id),
-          'input-alterado': notasAlteradas.has(aluno.id + '-' + avaliacao.id)
+          'input-erro': isInvalido(aluno.id, avaliacao.id),
+          'input-alterado': isAlterado(aluno.id, avaliacao.id)
         }"
-        [value]="inputsInvalidos.has(aluno.id + '-' + avaliacao.id) ? '' : getNotaValor(aluno.id, avaliacao.id)"
+        [value]="isInvalido(aluno.id, avaliacao.id) ? '' : getNotaValor(aluno.id, avaliacao.id)"
         (change)="atualizarNota(aluno.id, avaliacao.id, getValorDoEvento($event), notaInput)"
         min="0"
         max="10"
@@ -77,7 +77,7 @@
     mat-raised-button
     color="primary"
     (click)="salvarNotas()"
-    [disabled]="!turmaSelecionada || !disciplinaSelecionada || notasAlteradas.size === 0 || carregando"
+    [disabled]="!turmaSelecionada || !disciplinaSelecionada || !hasNotasAlteradas() || hasErros() || carregando"
   >
     <span *ngIf="!carregando">Salvar Notas</span>
     <span *ngIf="carregando" style="display: flex; align-items: center; gap: 8px">

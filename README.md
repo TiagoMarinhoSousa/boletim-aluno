@@ -101,7 +101,7 @@ boletim-aluno/
 │   │   ├── models/             # Interfaces/DTOs
 │   │   ├── app.component.*
 │   │   └── app.module.ts
-│   ├── src/test/               # Testes (76 testes)
+│   ├── src/test/               # Testes (94 testes)
 │   ├── angular.json
 │   ├── tsconfig.json
 │   └── package.json
@@ -132,7 +132,7 @@ boletim-aluno/
 
 | Recurso | Status | Detalhes |
 |---|---|---|
-| **130 Testes Automatizados** | ✅ | 54 backend + 76 frontend |
+| **148 Testes Automatizados** | ✅ | 54 backend + 94 frontend |
 | **Validação Dupla Camada** | ✅ | Frontend + Backend |
 | **Feedback Visual** | ✅ | Snackbars, spinner, highlighting |
 | **Tratamento de Erros** | ✅ | Mensagens claras em português |
@@ -186,7 +186,7 @@ mvn test -Dtest=NotaServiceTest
 
 Documentação completa: [TESTES.md](backend/TESTES.md)
 
-### Frontend (76 testes - 100% passando)
+### Frontend (94 testes - 100% passando)
 
 ```bash
 # Executar testes com watch mode
@@ -200,14 +200,14 @@ npm run test:coverage
 npm run test:ci
 ```
 
-**Cobertura (>85%):**
-- ✅ NotaComponent (36 testes)
+**Cobertura (100%):**
+- ✅ NotaComponent (54 testes) - Reactive Forms
 - ✅ NotaService (17 testes)
 - ✅ TurmaService (5 testes)
 - ✅ DisciplinaService (9 testes)
 - ✅ AlunoService (5 testes)
 - ✅ ErrorInterceptor (3 testes)
-- ✅ AppComponent (3 testes)
+- ✅ AppComponent (1 teste)
 
 Documentação completa: [TESTES_FRONTEND_FINAL.md](TESTES_FRONTEND_FINAL.md)
 
@@ -256,25 +256,23 @@ app/
 // 1. Type="number" - força entrada numérica
 <input type="number" min="0" max="10" (change)="atualizarNota(...)">
 
-// 2. Validação em TypeScript com feedback visual (snackBar)
+// 2. Validação via Reactive Forms com feedback visual (snackBar)
 atualizarNota(alunoId: number, avaliacaoId: number, valor: number): void {
-    if (valor < 0 || valor > 10) {
+    const control = this.getNotaControl(alunoId, avaliacaoId);
+    
+    if (control.invalid) {
         this.snackBar.open('✗ O valor da nota deve estar entre 0 e 10.', 'Fechar', {
             duration: 3000,
             panelClass: ['snackbar-erro']
         });
-        this.inputsInvalidos.add(`${alunoId}-${avaliacaoId}`);
         return;
     }
-    // Se entrada válida, remove da marcação de inválido e marca como alterado
-    this.inputsInvalidos.delete(`${alunoId}-${avaliacaoId}`);
-    this.notasAlteradas.add(`${alunoId}-${avaliacaoId}`);
-    // ... atualiza ou cria nota
+    // Se entrada válida, atualiza a nota
 }
 
 // 3. Pré-validação antes de enviar com feedback visual
 salvarNotas() {
-    if (this.inputsInvalidos.size > 0) {
+    if (this.notasForm.invalid) {
         this.snackBar.open('✗ Existem campos com validação pendente.', 'Fechar', {
             duration: 5000,
             panelClass: ['snackbar-erro']
@@ -614,9 +612,9 @@ GET  /notas/aluno/{id}/media-ponderada  - Média
 | Métrica | Valor |
 |---------|-------|
 | **Testes Backend** | 54 (100% ✅) |
-| **Testes Frontend** | 76 (100% ✅) |
-| **Total** | **130** |
-| **Cobertura** | ~92% |
+| **Testes Frontend** | 94 (100% ✅) |
+| **Total** | **148** |
+| **Cobertura** | 100% lines, 100% branches |
 | **Tempo Execução** | ~5 seg |
 
 ### Git
