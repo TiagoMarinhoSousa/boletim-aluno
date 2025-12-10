@@ -99,4 +99,100 @@ describe('NotaService', () => {
       req.flush(media);
     });
   });
+
+  describe('Salvar Nota Individual', () => {
+    it('deve fazer POST para /notas', () => {
+      const nota = { alunoId: 1, avaliacaoId: 1, valor: 8 };
+
+      service.salvarNota(nota).subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(nota);
+    });
+
+    it('deve retornar nota salva', () => {
+      const nota = { alunoId: 1, avaliacaoId: 1, valor: 8 };
+      const response = { id: 1, aluno: { id: 1 }, avaliacao: { id: 1 }, valor: 8 };
+
+      service.salvarNota(nota).subscribe((result) => {
+        expect(result).toEqual(response);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}`);
+      req.flush(response);
+    });
+  });
+
+  describe('Listar Todas as Notas', () => {
+    it('deve fazer GET para /notas', () => {
+      service.listarTodas().subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}`);
+      expect(req.request.method).toBe('GET');
+    });
+
+    it('deve retornar lista de notas', () => {
+      const notas = [
+        { alunoId: 1, avaliacaoId: 1, valor: 8 },
+        { alunoId: 2, avaliacaoId: 1, valor: 7 }
+      ];
+
+      service.listarTodas().subscribe((result) => {
+        expect(result).toEqual(notas);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}`);
+      req.flush(notas);
+    });
+  });
+
+  describe('Listar Boletim por Aluno', () => {
+    it('deve fazer GET para /notas/aluno/{id}/boletim', () => {
+      const alunoId = 1;
+
+      service.listarBoletimPorAluno(alunoId).subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}/aluno/${alunoId}/boletim`);
+      expect(req.request.method).toBe('GET');
+    });
+
+    it('deve retornar boletim do aluno', () => {
+      const alunoId = 1;
+      const boletim = [
+        { disciplina: 'Matemática', media: 8.5 },
+        { disciplina: 'Português', media: 7.0 }
+      ];
+
+      service.listarBoletimPorAluno(alunoId).subscribe((result) => {
+        expect(result).toEqual(boletim);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/aluno/${alunoId}/boletim`);
+      req.flush(boletim);
+    });
+  });
+
+  describe('Calcular Média por Disciplina', () => {
+    it('deve fazer GET para /notas/disciplina/{id}/media-ponderada', () => {
+      const disciplinaId = 1;
+
+      service.calcularMediaPorDisciplina(disciplinaId).subscribe();
+
+      const req = httpMock.expectOne(`${apiUrl}/disciplina/${disciplinaId}/media-ponderada`);
+      expect(req.request.method).toBe('GET');
+    });
+
+    it('deve retornar média ponderada da disciplina', () => {
+      const disciplinaId = 1;
+      const media = 7.8;
+
+      service.calcularMediaPorDisciplina(disciplinaId).subscribe((result) => {
+        expect(result).toBe(media);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/disciplina/${disciplinaId}/media-ponderada`);
+      req.flush(media);
+    });
+  });
 });

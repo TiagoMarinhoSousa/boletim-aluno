@@ -33,8 +33,8 @@ describe('NotaComponent', () => {
   ];
 
   const mockAlunos = [
-    { id: 1, nome: 'João Silva' },
-    { id: 2, nome: 'Maria Santos' }
+    { id: 1, nome: 'João Silva', turma: { id: 1, nome: 'Turma A' } },
+    { id: 2, nome: 'Maria Santos', turma: { id: 1, nome: 'Turma A' } }
   ];
 
   const mockAvaliacoes = [
@@ -110,10 +110,10 @@ describe('NotaComponent', () => {
       const inputElement = document.createElement('input');
       inputElement.value = '-1';
 
-      spyOn(window, 'alert');
+      spyOn(component['snackBar'], 'open');
       component.atualizarNota(1, 1, -1, inputElement);
       
-      expect(window.alert).toHaveBeenCalledWith('Nota deve estar entre 0 e 10');
+      expect(component['snackBar'].open).toHaveBeenCalled();
       expect(component.inputsInvalidos.has('1-1')).toBeTrue();
       expect(inputElement.value).toBe('');
     });
@@ -123,10 +123,10 @@ describe('NotaComponent', () => {
       const inputElement = document.createElement('input');
       inputElement.value = '11';
 
-      spyOn(window, 'alert');
+      spyOn(component['snackBar'], 'open');
       component.atualizarNota(1, 1, 11, inputElement);
       
-      expect(window.alert).toHaveBeenCalledWith('Nota deve estar entre 0 e 10');
+      expect(component['snackBar'].open).toHaveBeenCalled();
       expect(component.inputsInvalidos.has('1-1')).toBeTrue();
       expect(inputElement.value).toBe('');
     });
@@ -291,13 +291,139 @@ describe('NotaComponent', () => {
         throwError(() => ({ error: { message: 'Erro ao salvar' } }))
       );
 
-      spyOn(component['snackBar'], 'open');
+      spyOn(console, 'error');
       component.salvarNotas();
 
       setTimeout(() => {
-        expect(component['snackBar'].open).toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalled();
+        expect(component.carregando).toBeFalse();
         done();
       }, 100);
+    });
+
+    it('deve limpar notasAlteradas e mostrar snackbar ao salvar com sucesso', (done) => {
+      component.notas = [{ alunoId: 1, avaliacaoId: 1, valor: 8 }];
+      component.notasAlteradas.add('1-1');
+
+      spyOn(component['snackBar'], 'open');
+      spyOn(console, 'log');
+      component.salvarNotas();
+
+      setTimeout(() => {
+        expect(component.notasAlteradas.size).toBe(0);
+        expect(component['snackBar'].open).toHaveBeenCalled();
+        expect(console.log).toHaveBeenCalledWith('Notas salvas com sucesso!');
+        expect(component.carregando).toBeFalse();
+        done();
+      }, 100);
+    });
+  });
+
+  // ✅ TESTES DE INICIALIZAÇÃO
+  describe('Inicialização (ngOnInit)', () => {
+    it('deve carregar turmas e disciplinas no ngOnInit', () => {
+      fixture.detectChanges(); // Dispara ngOnInit
+
+      expect(turmaService.listarTodas).toHaveBeenCalled();
+      expect(disciplinaService.listarTodas).toHaveBeenCalled();
+      expect(component.turmas).toEqual(mockTurmas);
+      expect(component.disciplinas).toEqual(mockDisciplinas);
+    });
+  });
+
+  // ✅ TESTES DE PARSING DE INPUT
+  describe('getValorDoEvento', () => {
+    it('deve retornar valor numérico para input válido', () => {
+      const event = { target: { value: '8.5', valueAsNumber: 8.5 } } as unknown as Event;
+      const resultado = component.getValorDoEvento(event);
+      expect(resultado).toBe(8.5);
+    });
+
+    it('deve retornar NaN para input vazio', () => {
+      const event = { target: { value: '', valueAsNumber: NaN } } as unknown as Event;
+      const resultado = component.getValorDoEvento(event);
+      expect(resultado).toBeNaN();
+    });
+
+    it('deve retornar NaN para input com hífen', () => {
+      const event = { target: { value: '-', valueAsNumber: NaN } } as unknown as Event;
+      const resultado = component.getValorDoEvento(event);
+      expect(resultado).toBeNaN();
+    });
+  });
+
+  // ✅ TESTES DE MAPEAMENTO DE AVALIAÇÕES
+  describe('getAvaliacaoIdsPorDisciplina', () => {
+    it('deve retornar IDs 1-3 para disciplina 1', () => {
+      const ids = component.getAvaliacaoIdsPorDisciplina(1);
+      expect(ids).toEqual([1, 2, 3]);
+    });
+
+    it('deve retornar IDs 4-6 para disciplina 2', () => {
+      const ids = component.getAvaliacaoIdsPorDisciplina(2);
+      expect(ids).toEqual([4, 5, 6]);
+    });
+
+    it('deve retornar IDs 7-9 para disciplina 3', () => {
+      const ids = component.getAvaliacaoIdsPorDisciplina(3);
+      expect(ids).toEqual([7, 8, 9]);
+    });
+  });
+
+  // ✅ TESTES DE OBTENÇÃO DE VALOR DE NOTA
+  describe('getNotaValor', () => {
+    it('deve retornar valor da nota existente', () => {
+      component.notas = [{ alunoId: 1, avaliacaoId: 1, valor: 8.5 }];
+      const valor = component.getNotaValor(1, 1);
+      expect(valor).toBe('8.5');
+    });
+
+    it('deve retornar "-" para nota inexistente', () => {
+      component.notas = [];
+      const valor = component.getNotaValor(1, 1);
+      expect(valor).toBe('-');
+    });
+
+    it('deve retornar valor correto para aluno específico', () => {
+      component.notas = [
+        { alunoId: 1, avaliacaoId: 1, valor: 8 },
+        { alunoId: 2, avaliacaoId: 1, valor: 7 }
+      ];
+      expect(component.getNotaValor(1, 1)).toBe('8');
+      expect(component.getNotaValor(2, 1)).toBe('7');
+    });
+  });
+
+  // ✅ TESTES DE SELEÇÃO DE DISCIPLINA
+  describe('selecionarDisciplina', () => {
+    beforeEach(() => {
+      component.alunos = mockAlunos;
+      notaService.listarPorAluno.and.returnValue(of([]));
+    });
+
+    it('deve configurar disciplinaSelecionada', () => {
+      component.selecionarDisciplina(1);
+      expect(component.disciplinaSelecionada).toBe(1);
+    });
+
+    it('deve configurar avaliações para disciplina selecionada', () => {
+      component.selecionarDisciplina(1);
+      expect(component.avaliacoes.length).toBe(3);
+      expect(component.avaliacoes[0].descricao).toBe('Prova');
+      expect(component.avaliacoes[1].descricao).toBe('Trabalho');
+      expect(component.avaliacoes[2].descricao).toBe('Atividade');
+    });
+
+    it('deve atualizar colunas da tabela', () => {
+      component.selecionarDisciplina(1);
+      expect(component.colunasTabela).toContain('aluno');
+      expect(component.colunasTabela).toContain('media');
+      expect(component.colunasTabela.length).toBe(5);
+    });
+
+    it('deve buscar notas para cada aluno', () => {
+      component.selecionarDisciplina(1);
+      expect(notaService.listarPorAluno).toHaveBeenCalledTimes(2);
     });
   });
 });

@@ -97,7 +97,13 @@
               "@angular/material/prebuilt-themes/deeppurple-amber.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "src/main.ts",
+              "src/**/*.module.ts",
+              "src/**/*.routing.ts"
+            ]
           }
         }
       }

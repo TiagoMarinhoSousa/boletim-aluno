@@ -81,4 +81,42 @@ describe('ErrorInterceptor', () => {
       })
     );
   });
+
+  it('deve exibir error.message quando não há mensagem no corpo da resposta', () => {
+    spyOn(snackBar, 'open');
+
+    // Erro sem corpo de resposta ou com corpo inválido
+    httpClient.get('/api/teste').subscribe({
+      next: () => fail('A requisição deveria ter falhado'),
+      error: () => {},
+    });
+
+    const req = httpMock.expectOne('/api/teste');
+    // Simular um erro de rede sem corpo de resposta
+    req.error(new ProgressEvent('error'), {
+      status: 0,
+      statusText: 'Unknown Error'
+    });
+
+    expect(snackBar.open).toHaveBeenCalled();
+  });
+
+  it('deve exibir mensagem padrão quando não há nenhuma mensagem disponível', () => {
+    spyOn(snackBar, 'open');
+
+    httpClient.get('/api/outro').subscribe({
+      next: () => fail('A requisição deveria ter falhado'),
+      error: () => {},
+    });
+
+    const req = httpMock.expectOne('/api/outro');
+    // Resposta com corpo vazio (objeto vazio sem message)
+    req.flush({}, {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+
+    // Deve usar a mensagem padrão pois não há errorResponse.message nem error.message
+    expect(snackBar.open).toHaveBeenCalled();
+  });
 });
